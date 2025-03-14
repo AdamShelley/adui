@@ -52,14 +52,14 @@ const SearchBar = () => {
       >
         <motion.div
           ref={inputRef}
-          className={`relative flex items-center rounded-lg border box-border ${
+          className={`relative flex items-center rounded-lg border box-border bg-zinc-100 ${
             isFocused ? "border-zinc-500" : "border-zinc-200"
           }`}
           initial={{ width: "59%" }}
           animate={{
             width: isFocused ? "60%" : "59%",
             boxShadow: isFocused ? "0 5px 10px rgba(0, 0, 0, 0.05)" : "none",
-            borderBottom: isFocused ? "border-zinc-200" : "border-zinc-500",
+            borderBottom: isFocused ? "border-zinc-200" : "border-zinc-200",
             borderBottomLeftRadius: isFocused ? 0 : "0.375rem",
             borderBottomRightRadius: isFocused ? 0 : "0.375rem",
           }}
@@ -96,7 +96,7 @@ const SearchBar = () => {
           <motion.input
             type="text"
             placeholder="Search..."
-            className="p-3 w-full outline-none relative"
+            className="p-3 w-full outline-none relative "
             onFocus={() => setIsFocused(true)}
             onChange={onChangeHandler}
             animate={{
@@ -129,22 +129,39 @@ const SuggestionDropdown = () => {
   return (
     <AnimatePresence>
       <motion.div
-        className="absolute w-full bg-white shadow-lg top-full left-0 right-0 rounded-b-xl border border-t-0 border-zinc-500 box-border"
+        className="absolute w-full bg-white shadow-lg top-full left-0 right-0 rounded-b-xl border border-t-0 border-zinc-500 box-border overflow-hidden"
         style={{
           top: "calc(100% - 1px)",
           width: "calc(100% + 2px)",
           marginLeft: "-1px",
         }}
-        initial={{ opacity: 0, y: -50 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ type: "spring", stiffness: 500, damping: 25 }}
-        exit={{ opacity: 0, y: 10 }}
+        initial={{ opacity: 0, height: 0 }}
+        animate={{ opacity: 1, height: "auto" }}
+        transition={{
+          type: "spring",
+          stiffness: 400,
+          damping: 30,
+          duration: 0.2,
+        }}
+        exit={{ opacity: 0, height: 0 }}
       >
-        <ul className="p-2">
-          <li className="p-2 hover:bg-gray-100 cursor-pointer">Suggestion 1</li>
-          <li className="p-2 hover:bg-gray-100 cursor-pointer">Suggestion 2</li>
-          <li className="p-2 hover:bg-gray-100 cursor-pointer">Suggestion 3</li>
-        </ul>
+        <motion.ul className="p-2">
+          {["Suggestion 1", "Suggestion 2", "Suggestion 3"].map(
+            (suggestion, index) => (
+              <motion.li
+                key={suggestion}
+                className="p-2 hover:bg-gray-100 cursor-pointer rounded-md"
+                initial={{ opacity: 0, x: -10 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: index * 0.05, duration: 0.2 }}
+                whileHover={{ backgroundColor: "#f3f4f6", scale: 1.01 }}
+                whileTap={{ scale: 0.99 }}
+              >
+                {suggestion}
+              </motion.li>
+            )
+          )}
+        </motion.ul>
       </motion.div>
     </AnimatePresence>
   );
