@@ -1,18 +1,31 @@
 import { AnimatePresence } from "motion/react";
 import * as motion from "motion/react-client";
 import { useState, useRef, useEffect } from "react";
+import "./Search-bar.css"; // Assuming you have a CSS file
 
-const SearchBar = () => {
+interface Option {
+  id: number;
+  label: string;
+}
+
+interface SearchBarProps {
+  dropdownOptions?: Option[];
+}
+
+const SearchBar: React.FC<SearchBarProps> = ({ dropdownOptions }) => {
+  const [inputValue, setInputValue] = useState("");
   const [isFocused, setIsFocused] = useState(false);
   const inputRef = useRef(null);
   const [searchValue, setSearchValue] = useState("");
-  const [suggestions, setSuggestions] = useState<string[]>([]);
+  const [suggestions, setSuggestions] = useState(dropdownOptions);
   const [selectedIndex, setSelectedIndex] = useState(-1);
 
   const filterSuggestions = () => {
     if (searchValue.length > 0) {
-      const filteredSuggestions = suggestions.filter((suggestion) => {
-        return suggestion.toLowerCase().includes(searchValue.toLowerCase());
+      const filteredSuggestions = suggestions?.filter((suggestion) => {
+        return suggestion.label
+          .toLowerCase()
+          .includes(searchValue.toLowerCase());
       });
       return filteredSuggestions;
     }
@@ -52,14 +65,14 @@ const SearchBar = () => {
       >
         <motion.div
           ref={inputRef}
-          className={`relative flex items-center rounded-lg border box-border bg-zinc-100 ${
+          className={`relative flex items-center rounded-lg border box-border bg-white ${
             isFocused ? "border-zinc-500" : "border-zinc-200"
           }`}
-          initial={{ width: "59%" }}
+          initial={{ width: "50%" }}
           animate={{
-            width: isFocused ? "60%" : "59%",
-            boxShadow: isFocused ? "0 5px 10px rgba(0, 0, 0, 0.05)" : "none",
+            width: isFocused ? "51%" : "50%",
             borderBottom: isFocused ? "border-zinc-200" : "border-zinc-200",
+            boxShadow: isFocused ? "0 5px 10px rgba(0, 0, 0, 0.05)" : "none",
             borderBottomLeftRadius: isFocused ? 0 : "0.375rem",
             borderBottomRightRadius: isFocused ? 0 : "0.375rem",
           }}
@@ -104,7 +117,7 @@ const SearchBar = () => {
             }}
           />
 
-          {isFocused && (
+          {/* {isFocused && (
             <motion.button
               className="bg-zinc-500 text-white px-4 h-full rounded-sm mr-2 "
               initial={{ x: 100, opacity: 0 }}
@@ -114,9 +127,11 @@ const SearchBar = () => {
             >
               Search
             </motion.button>
-          )}
+          )} */}
 
-          {isFocused && <SuggestionDropdown />}
+          {isFocused && dropdownOptions?.length && suggestions && (
+            <SuggestionDropdown suggestions={suggestions} />
+          )}
         </motion.div>
       </motion.div>
     </AnimatePresence>
@@ -125,7 +140,7 @@ const SearchBar = () => {
 
 export default SearchBar;
 
-const SuggestionDropdown = () => {
+const SuggestionDropdown = ({ suggestions }: { suggestions: Option[] }) => {
   return (
     <AnimatePresence>
       <motion.div
@@ -146,21 +161,18 @@ const SuggestionDropdown = () => {
         exit={{ opacity: 0, height: 0 }}
       >
         <motion.ul className="p-2">
-          {["Suggestion 1", "Suggestion 2", "Suggestion 3"].map(
-            (suggestion, index) => (
-              <motion.li
-                key={suggestion}
-                className="p-2 hover:bg-gray-100 cursor-pointer rounded-md"
-                initial={{ opacity: 0, x: -10 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: index * 0.05, duration: 0.2 }}
-                whileHover={{ backgroundColor: "#f3f4f6", scale: 1.01 }}
-                whileTap={{ scale: 0.99 }}
-              >
-                {suggestion}
-              </motion.li>
-            )
-          )}
+          {suggestions.map((suggestion, index) => (
+            <motion.li
+              key={suggestion?.id || suggestion.label}
+              className="p-2 hover:bg-gray-100 cursor-pointer rounded-md suggestion-item"
+              initial={{ opacity: 0, x: -10 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: index * 0.05, duration: 0.2 }}
+              whileTap={{ scale: 0.99 }}
+            >
+              {suggestion.label}
+            </motion.li>
+          ))}
         </motion.ul>
       </motion.div>
     </AnimatePresence>

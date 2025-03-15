@@ -1,0 +1,34 @@
+.search-container {
+  position: relative;
+  width: 300px;
+}
+
+.suggestions-list {
+  position: absolute;
+  width: 100%;
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+  border: 1px solid #ccc;
+  border-top: none;
+  max-height: 200px;
+  overflow-y: auto;
+  background-color: white;
+}
+
+.suggestion-item {
+  padding: 10px;
+  cursor: pointer;
+  background-color: white; /* Default background is white */
+  transition: background-color 0.1s ease; /* Quick transition */
+}
+
+/* Apply hover effect ONLY when actually hovering */
+.suggestion-item:hover {
+  background-color: #f0f0f0; /* Grey background on hover */
+}
+
+/* Ensure the element returns to white when not hovered */
+.suggestion-item:not(:hover) {
+  background-color: white;
+}
