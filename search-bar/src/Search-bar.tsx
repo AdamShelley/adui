@@ -37,7 +37,12 @@ const SearchBar: React.FC<SearchBarProps> = ({ dropdownOptions }) => {
     setSuggestions(filterSuggestions());
   };
 
-  // Handle outside clicks to reset the focus state
+  const handleSuggestionClick = (suggestion: Option) => {
+    setSearchValue(suggestion.label);
+    setInputValue(suggestion.label);
+    setIsFocused(false);
+  };
+
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent): void => {
       if (
@@ -112,25 +117,17 @@ const SearchBar: React.FC<SearchBarProps> = ({ dropdownOptions }) => {
             className="p-3 w-full outline-none relative "
             onFocus={() => setIsFocused(true)}
             onChange={onChangeHandler}
+            value={searchValue}
             animate={{
               paddingLeft: isFocused ? "12px" : "8px",
             }}
           />
 
-          {/* {isFocused && (
-            <motion.button
-              className="bg-zinc-500 text-white px-4 h-full rounded-sm mr-2 "
-              initial={{ x: 100, opacity: 0 }}
-              animate={{ x: 0, opacity: 1 }}
-              exit={{ x: 100, opacity: 0 }}
-              onClick={() => console.log("Search submitted")}
-            >
-              Search
-            </motion.button>
-          )} */}
-
-          {isFocused && dropdownOptions?.length && suggestions && (
-            <SuggestionDropdown suggestions={suggestions} />
+          {isFocused && dropdownOptions?.length && (
+            <SuggestionDropdown
+              suggestions={dropdownOptions}
+              onSuggestionClick={handleSuggestionClick}
+            />
           )}
         </motion.div>
       </motion.div>
@@ -140,7 +137,15 @@ const SearchBar: React.FC<SearchBarProps> = ({ dropdownOptions }) => {
 
 export default SearchBar;
 
-const SuggestionDropdown = ({ suggestions }: { suggestions: Option[] }) => {
+interface SuggestionDropdownProps {
+  suggestions: Option[];
+  onSuggestionClick: (suggestion: Option) => void;
+}
+
+const SuggestionDropdown = ({
+  suggestions,
+  onSuggestionClick,
+}: SuggestionDropdownProps) => {
   return (
     <AnimatePresence>
       <motion.div
@@ -149,26 +154,48 @@ const SuggestionDropdown = ({ suggestions }: { suggestions: Option[] }) => {
           top: "calc(100% - 1px)",
           width: "calc(100% + 2px)",
           marginLeft: "-1px",
+          transformOrigin: "top",
         }}
-        initial={{ opacity: 0, height: 0 }}
-        animate={{ opacity: 1, height: "auto" }}
+        initial={{
+          opacity: 0,
+          height: 0,
+          scaleY: 0.8,
+          y: -5,
+        }}
+        animate={{
+          opacity: 1,
+          height: "auto",
+          scaleY: 1,
+          y: 0,
+        }}
         transition={{
           type: "spring",
           stiffness: 400,
           damping: 30,
-          duration: 0.2,
+          duration: 0.3,
+          opacity: { duration: 0.2 },
+          height: { duration: 0.25 },
         }}
-        exit={{ opacity: 0, height: 0 }}
+        exit={{
+          opacity: 0,
+          height: 0,
+          scaleY: 0.8,
+          transition: {
+            duration: 0.2,
+            height: { duration: 0.15 },
+          },
+        }}
       >
         <motion.ul className="p-2">
           {suggestions.map((suggestion, index) => (
             <motion.li
-              key={suggestion?.id || suggestion.label}
+              key={suggestion.id || index}
               className="p-2 hover:bg-gray-100 cursor-pointer rounded-md suggestion-item"
               initial={{ opacity: 0, x: -10 }}
               animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: index * 0.05, duration: 0.2 }}
+              transition={{ delay: index * 0.03, duration: 0.2 }}
               whileTap={{ scale: 0.99 }}
+              onClick={() => onSuggestionClick(suggestion)}
             >
               {suggestion.label}
             </motion.li>
