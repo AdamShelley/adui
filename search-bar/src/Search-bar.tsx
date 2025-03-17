@@ -1,7 +1,7 @@
 import { AnimatePresence } from "motion/react";
 import * as motion from "motion/react-client";
 import { useState, useRef, useEffect } from "react";
-import "./Search-bar.css"; // Assuming you have a CSS file
+import "./Search-bar.css";
 
 interface Option {
   id: number;
@@ -10,38 +10,42 @@ interface Option {
 
 interface SearchBarProps {
   dropdownOptions?: Option[];
+  maxSuggestions?: number;
 }
 
-const SearchBar: React.FC<SearchBarProps> = ({ dropdownOptions }) => {
-  const [inputValue, setInputValue] = useState("");
+const SearchBar: React.FC<SearchBarProps> = ({
+  dropdownOptions = [],
+  maxSuggestions = 5,
+}) => {
   const [isFocused, setIsFocused] = useState(false);
   const inputRef = useRef(null);
   const [searchValue, setSearchValue] = useState("");
-  const [suggestions, setSuggestions] = useState(dropdownOptions);
-  const [selectedIndex, setSelectedIndex] = useState(-1);
+  const [filteredSuggestions, setFilteredSuggestions] = useState<Option[]>([]);
 
-  const filterSuggestions = () => {
-    if (searchValue.length > 0) {
-      const filteredSuggestions = suggestions?.filter((suggestion) => {
-        return suggestion.label
-          .toLowerCase()
-          .includes(searchValue.toLowerCase());
-      });
-      return filteredSuggestions;
-    }
-    return [];
+  const filterSuggestions = (value: string) => {
+    if (!dropdownOptions || value.length === 0) return [];
+
+    return dropdownOptions.filter((suggestion) =>
+      suggestion.label.toLowerCase().includes(value.toLowerCase())
+    );
   };
 
   const onChangeHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchValue(event.target.value);
-    setSuggestions(filterSuggestions());
+    const value = event.target.value;
+    setSearchValue(value);
+    setFilteredSuggestions(filterSuggestions(value));
   };
 
   const handleSuggestionClick = (suggestion: Option) => {
     setSearchValue(suggestion.label);
-    setInputValue(suggestion.label);
     setIsFocused(false);
   };
+
+  useEffect(() => {
+    if (searchValue) {
+      setFilteredSuggestions(filterSuggestions(searchValue));
+    }
+  }, [dropdownOptions]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent): void => {
@@ -58,6 +62,16 @@ const SearchBar: React.FC<SearchBarProps> = ({ dropdownOptions }) => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
+
+  const suggestionsToDisplay =
+    searchValue.length > 0
+      ? filteredSuggestions.slice(0, maxSuggestions)
+      : dropdownOptions.slice(0, maxSuggestions);
+
+  const hasMoreResults =
+    searchValue.length > 0
+      ? filteredSuggestions.length > maxSuggestions
+      : dropdownOptions.length > maxSuggestions;
 
   return (
     <AnimatePresence initial={false}>
@@ -123,10 +137,16 @@ const SearchBar: React.FC<SearchBarProps> = ({ dropdownOptions }) => {
             }}
           />
 
-          {isFocused && dropdownOptions?.length && (
+          {isFocused && dropdownOptions?.length > 0 && (
             <SuggestionDropdown
-              suggestions={dropdownOptions}
+              suggestions={suggestionsToDisplay}
               onSuggestionClick={handleSuggestionClick}
+              hasMoreResults={hasMoreResults}
+              totalResults={
+                searchValue.length > 0
+                  ? filteredSuggestions.length
+                  : dropdownOptions.length
+              }
             />
           )}
         </motion.div>
@@ -140,11 +160,15 @@ export default SearchBar;
 interface SuggestionDropdownProps {
   suggestions: Option[];
   onSuggestionClick: (suggestion: Option) => void;
+  hasMoreResults?: boolean;
+  totalResults?: number;
 }
 
 const SuggestionDropdown = ({
   suggestions,
   onSuggestionClick,
+  hasMoreResults = false,
+  totalResults = 0,
 }: SuggestionDropdownProps) => {
   return (
     <AnimatePresence>
@@ -187,19 +211,40 @@ const SuggestionDropdown = ({
         }}
       >
         <motion.ul className="p-2">
-          {suggestions.map((suggestion, index) => (
-            <motion.li
-              key={suggestion.id || index}
-              className="p-2 hover:bg-gray-100 cursor-pointer rounded-md suggestion-item"
-              initial={{ opacity: 0, x: -10 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: index * 0.03, duration: 0.2 }}
-              whileTap={{ scale: 0.99 }}
-              onClick={() => onSuggestionClick(suggestion)}
+          {suggestions.length > 0 ? (
+            <>
+              {suggestions.map((suggestion, index) => (
+                <motion.li
+                  key={suggestion.id || index}
+                  className="p-2 hover:bg-gray-100 cursor-pointer rounded-md suggestion-item"
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: index * 0.03, duration: 0.2 }}
+                  whileTap={{ scale: 0.99 }}
+                  onClick={() => onSuggestionClick(suggestion)}
+                >
+                  {suggestion.label}
+                </motion.li>
+              ))}
+              {hasMoreResults && (
+                <motion.div
+                  className="text-xs text-gray-500 p-2 text-center border-t border-gray-100 mt-1"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                >
+                  {`Showing ${suggestions.length} of ${totalResults} results`}
+                </motion.div>
+              )}
+            </>
+          ) : (
+            <motion.div
+              className="p-2 text-gray-500 text-center"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
             >
-              {suggestion.label}
-            </motion.li>
-          ))}
+              No results found
+            </motion.div>
+          )}
         </motion.ul>
       </motion.div>
     </AnimatePresence>
