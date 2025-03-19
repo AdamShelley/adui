@@ -20,9 +20,10 @@ const SearchBar: React.FC<SearchBarProps> = ({
   const [isFocused, setIsFocused] = useState(false);
   const inputRef = useRef(null);
   const [searchValue, setSearchValue] = useState("");
-  const [displayValue, setDisplayValue] = useState(""); // New state for display value
+  const [displayValue, setDisplayValue] = useState("");
   const [filteredSuggestions, setFilteredSuggestions] = useState<Option[]>([]);
   const [selectedIndex, setSelectedIndex] = useState(-1);
+  const [showSuggestions, setShowSuggestions] = useState(true);
 
   const filterSuggestions = useCallback(
     (value: string) => {
@@ -38,15 +39,20 @@ const SearchBar: React.FC<SearchBarProps> = ({
   const onChangeHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value;
     setSearchValue(value);
-    setDisplayValue(value); // Keep display value in sync when typing
-    setFilteredSuggestions(filterSuggestions(value));
-    setSelectedIndex(-1); // Reset selection index when typing
+    setDisplayValue(value);
+    setShowSuggestions(true);
+    if (value.length > 0) {
+      setFilteredSuggestions(filterSuggestions(value));
+    } else {
+      setFilteredSuggestions([]);
+    }
+    setSelectedIndex(-1);
   };
 
   const handleSuggestionClick = (suggestion: Option) => {
     setSearchValue(suggestion.label);
-    setDisplayValue(suggestion.label); // Update display value on selection
-    setIsFocused(false);
+    setDisplayValue(suggestion.label);
+    setShowSuggestions(false);
     setSelectedIndex(-1);
   };
 
@@ -57,11 +63,9 @@ const SearchBar: React.FC<SearchBarProps> = ({
         : dropdownOptions.slice(0, maxSuggestions);
 
     if (event.key === "Enter") {
-      // If we have a selected suggestion, use it
       if (selectedIndex >= 0 && selectedIndex < suggestionsToDisplay.length) {
         handleSuggestionClick(suggestionsToDisplay[selectedIndex]);
       } else {
-        // Try to find an exact match
         const selectedSuggestion = filteredSuggestions.find(
           (suggestion) => suggestion.label === searchValue
         );
@@ -78,7 +82,6 @@ const SearchBar: React.FC<SearchBarProps> = ({
             ? selectedIndex + 1
             : 0;
         setSelectedIndex(nextIndex);
-        // Show the suggestion in the input but don't update searchValue
         setDisplayValue(suggestionsToDisplay[nextIndex].label);
       }
     } else if (event.key === "ArrowUp") {
@@ -89,13 +92,15 @@ const SearchBar: React.FC<SearchBarProps> = ({
             ? selectedIndex - 1
             : suggestionsToDisplay.length - 1;
         setSelectedIndex(prevIndex);
-        // Show the suggestion in the input but don't update searchValue
         setDisplayValue(suggestionsToDisplay[prevIndex].label);
       }
     } else if (event.key === "Escape") {
       setIsFocused(false);
       setSelectedIndex(-1);
-      setDisplayValue(searchValue); // Reset display value to match search value
+      setDisplayValue(searchValue);
+      setShowSuggestions(false);
+    } else {
+      setShowSuggestions(true);
     }
   };
 
@@ -106,7 +111,6 @@ const SearchBar: React.FC<SearchBarProps> = ({
   }, [dropdownOptions, filterSuggestions, searchValue]);
 
   useEffect(() => {
-    // Initialize displayValue with searchValue
     setDisplayValue(searchValue);
   }, [searchValue]);
 
@@ -117,7 +121,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
         !(inputRef.current as HTMLDivElement).contains(event.target as Node)
       ) {
         setIsFocused(false);
-        setDisplayValue(searchValue); // Reset display value when clicked outside
+        setDisplayValue(searchValue);
       }
     };
 
@@ -193,28 +197,36 @@ const SearchBar: React.FC<SearchBarProps> = ({
             type="text"
             placeholder="Search..."
             className="p-3 w-full outline-none relative "
-            onFocus={() => setIsFocused(true)}
+            onFocus={() => {
+              setIsFocused(true);
+              if (searchValue.length > 0) {
+                setShowSuggestions(true);
+              }
+            }}
             onChange={onChangeHandler}
-            value={displayValue} // Use displayValue instead of searchValue
+            value={displayValue}
             onKeyDown={(e) => handleKeyDown(e)}
             animate={{
               paddingLeft: isFocused ? "12px" : "8px",
             }}
           />
 
-          {isFocused && dropdownOptions?.length > 0 && (
-            <SuggestionDropdown
-              suggestions={suggestionsToDisplay}
-              onSuggestionClick={handleSuggestionClick}
-              hasMoreResults={hasMoreResults}
-              totalResults={
-                searchValue.length > 0
-                  ? filteredSuggestions.length
-                  : dropdownOptions.length
-              }
-              selectedIndex={selectedIndex}
-            />
-          )}
+          {isFocused &&
+            dropdownOptions?.length > 0 &&
+            searchValue.length > 0 &&
+            showSuggestions && (
+              <SuggestionDropdown
+                suggestions={suggestionsToDisplay}
+                onSuggestionClick={handleSuggestionClick}
+                hasMoreResults={hasMoreResults}
+                totalResults={
+                  searchValue.length > 0
+                    ? filteredSuggestions.length
+                    : dropdownOptions.length
+                }
+                selectedIndex={selectedIndex}
+              />
+            )}
         </motion.div>
       </motion.div>
     </AnimatePresence>
@@ -228,7 +240,7 @@ interface SuggestionDropdownProps {
   onSuggestionClick: (suggestion: Option) => void;
   hasMoreResults?: boolean;
   totalResults?: number;
-  selectedIndex?: number; // Add this prop to the interface
+  selectedIndex?: number;
 }
 
 const SuggestionDropdown = ({
@@ -236,7 +248,7 @@ const SuggestionDropdown = ({
   onSuggestionClick,
   hasMoreResults = false,
   totalResults = 0,
-  selectedIndex = -1, // Add this prop with default value
+  selectedIndex = -1,
 }: SuggestionDropdownProps) => {
   return (
     <AnimatePresence>
@@ -285,7 +297,7 @@ const SuggestionDropdown = ({
                 <motion.li
                   key={suggestion.id || index}
                   className={`p-2 hover:bg-gray-100 cursor-pointer rounded-md suggestion-item ${
-                    index === selectedIndex ? "bg-gray-100" : ""
+                    index === selectedIndex ? "font-medium !bg-zinc-100" : ""
                   }`}
                   initial={{ opacity: 0, x: -10 }}
                   animate={{ opacity: 1, x: 0 }}

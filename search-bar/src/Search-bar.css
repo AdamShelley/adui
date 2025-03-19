@@ -19,16 +19,14 @@
 .suggestion-item {
   padding: 10px;
   cursor: pointer;
-  background-color: white; /* Default background is white */
-  transition: background-color 0.1s ease; /* Quick transition */
+  background-color: white;
+  transition: background-color 0.1s ease;
 }
 
-/* Apply hover effect ONLY when actually hovering */
 .suggestion-item:hover {
-  background-color: #f0f0f0; /* Grey background on hover */
+  background-color: #f0f0f0;
 }
 
-/* Ensure the element returns to white when not hovered */
 .suggestion-item:not(:hover) {
   background-color: white;
 }
