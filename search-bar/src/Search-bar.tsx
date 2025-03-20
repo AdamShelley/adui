@@ -160,8 +160,20 @@ const SearchBar: React.FC<SearchBarProps> = ({
             width: isFocused ? "51%" : "50%",
             borderBottom: isFocused ? "border-zinc-200" : "border-zinc-200",
             boxShadow: isFocused ? "0 5px 10px rgba(0, 0, 0, 0.05)" : "none",
-            borderBottomLeftRadius: isFocused ? 0 : "0.375rem",
-            borderBottomRightRadius: isFocused ? 0 : "0.375rem",
+            borderBottomLeftRadius:
+              isFocused &&
+              showSuggestions &&
+              searchValue.length > 0 &&
+              suggestionsToDisplay.length > 0
+                ? 0
+                : "0.375rem",
+            borderBottomRightRadius:
+              isFocused &&
+              showSuggestions &&
+              searchValue.length > 0 &&
+              suggestionsToDisplay.length > 0
+                ? 0
+                : "0.375rem",
           }}
           transition={{
             type: "spring",
