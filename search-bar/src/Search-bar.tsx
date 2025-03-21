@@ -11,11 +11,17 @@ interface Option {
 interface SearchBarProps {
   dropdownOptions?: Option[];
   maxSuggestions?: number;
+  placeholder?: string;
+  onSelect?: (selectedOption: Option) => void;
+  onChange?: (inputValue: string) => void;
 }
 
 const SearchBar: React.FC<SearchBarProps> = ({
   dropdownOptions = [],
   maxSuggestions = 5,
+  placeholder,
+  onSelect,
+  onChange,
 }) => {
   const [isFocused, setIsFocused] = useState(false);
   const inputRef = useRef(null);
@@ -43,6 +49,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
     setShowSuggestions(true);
     if (value.length > 0) {
       setFilteredSuggestions(filterSuggestions(value));
+      onChange?.(value);
     } else {
       setFilteredSuggestions([]);
     }
@@ -52,6 +59,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
   const handleSuggestionClick = (suggestion: Option) => {
     setSearchValue(suggestion.label);
     setDisplayValue(suggestion.label);
+    onSelect?.(suggestion);
     setShowSuggestions(false);
     setSelectedIndex(-1);
   };
@@ -161,10 +169,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
             borderBottom: isFocused ? "border-zinc-200" : "border-zinc-200",
             boxShadow: isFocused ? "0 5px 10px rgba(0, 0, 0, 0.05)" : "none",
             borderBottomLeftRadius:
-              isFocused &&
-              showSuggestions &&
-              searchValue.length > 0 &&
-              suggestionsToDisplay.length > 0
+              isFocused && showSuggestions && searchValue.length > 0
                 ? 0
                 : "0.375rem",
             borderBottomRightRadius:
@@ -207,7 +212,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
 
           <motion.input
             type="text"
-            placeholder="Search..."
+            placeholder={placeholder || "Search..."}
             className="p-3 w-full outline-none relative "
             onFocus={() => {
               setIsFocused(true);

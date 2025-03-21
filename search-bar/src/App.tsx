@@ -15,6 +15,14 @@ const testSuggestions = [
 ];
 
 function App() {
+  const selectionHandler = (selectedOption: { id: number; label: string }) => {
+    console.log("Selected option:", selectedOption);
+  };
+
+  const onInputChangeHandler = (inputValue: string) => {
+    console.log("Input value changed:", inputValue);
+  };
+
   return (
     <NoiseBackground className="min-h-screen ">
       <main className=" w-screen h-screen">
@@ -22,7 +30,13 @@ function App() {
           <h1 className="text-md font-bold text-center text-white mt-10">
             Search Bar
           </h1>
-          <SearchBar dropdownOptions={testSuggestions} maxSuggestions={4} />
+          <SearchBar
+            dropdownOptions={testSuggestions}
+            maxSuggestions={4}
+            placeholder="This is a placeholder"
+            onSelect={(e) => selectionHandler(e)}
+            onChange={(e) => onInputChangeHandler(e)}
+          />
         </div>
       </main>
     </NoiseBackground>
