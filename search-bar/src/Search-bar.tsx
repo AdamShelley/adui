@@ -14,6 +14,7 @@ interface SearchBarProps {
   placeholder?: string;
   onSelect?: (selectedOption: Option) => void;
   onChange?: (inputValue: string) => void;
+  disabled?: boolean;
 }
 
 const SearchBar: React.FC<SearchBarProps> = ({
@@ -22,6 +23,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
   placeholder,
   onSelect,
   onChange,
+  disabled,
 }) => {
   const [isFocused, setIsFocused] = useState(false);
   const inputRef = useRef(null);
@@ -214,6 +216,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
             type="text"
             placeholder={placeholder || "Search..."}
             className="p-3 w-full outline-none relative "
+            disabled={disabled}
             onFocus={() => {
               setIsFocused(true);
               if (searchValue.length > 0) {
