@@ -15,6 +15,8 @@ interface SearchBarProps {
   onSelect?: (selectedOption: Option) => void;
   onChange?: (inputValue: string) => void;
   disabled?: boolean;
+  minimizable?: boolean;
+  showClearButton?: boolean;
 }
 
 const SearchBar: React.FC<SearchBarProps> = ({
@@ -24,6 +26,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
   onSelect,
   onChange,
   disabled,
+  showClearButton,
 }) => {
   const [isFocused, setIsFocused] = useState(false);
   const inputRef = useRef(null);
@@ -151,6 +154,14 @@ const SearchBar: React.FC<SearchBarProps> = ({
       ? filteredSuggestions.length > maxSuggestions
       : dropdownOptions.length > maxSuggestions;
 
+  const clearSearchHandler = () => {
+    setSearchValue("");
+    setDisplayValue("");
+    setShowSuggestions(false);
+    setSelectedIndex(-1);
+    setIsFocused(false);
+  };
+
   return (
     <AnimatePresence initial={false}>
       <motion.div
@@ -230,6 +241,13 @@ const SearchBar: React.FC<SearchBarProps> = ({
               paddingLeft: isFocused ? "12px" : "8px",
             }}
           />
+          {showClearButton ? (
+            <div className="rounded-sm p-1 mr-2 bg-zinc-100 hover:bg-zinc-200 transition cursor-pointer">
+              <button className="" onClick={clearSearchHandler}>
+                Clear
+              </button>
+            </div>
+          ) : null}
 
           {isFocused &&
             dropdownOptions?.length > 0 &&

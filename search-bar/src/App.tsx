@@ -36,6 +36,7 @@ function App() {
             placeholder="This is a placeholder"
             onSelect={(e) => selectionHandler(e)}
             onChange={(e) => onInputChangeHandler(e)}
+            showClearButton
           />
         </div>
       </main>
