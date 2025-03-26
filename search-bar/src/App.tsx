@@ -12,6 +12,15 @@ const testSuggestions = [
   { id: 6, label: "Orange" },
   { id: 7, label: "Pineapple" },
   { id: 8, label: "Strawberry" },
+  { id: 9, label: "Watermelon" },
+  { id: 10, label: "Grapes" },
+  { id: 11, label: "Mango" },
+  { id: 12, label: "Peach" },
+  { id: 13, label: "Blueberry" },
+  { id: 14, label: "Raspberry" },
+  { id: 15, label: "Blackberry" },
+  { id: 16, label: "Kiwi" },
+  { id: 17, label: "Papaya" },
 ];
 
 function App() {

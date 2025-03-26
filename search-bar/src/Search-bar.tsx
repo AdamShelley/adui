@@ -2,6 +2,7 @@ import { AnimatePresence } from "motion/react";
 import * as motion from "motion/react-client";
 import { useState, useRef, useEffect, useCallback } from "react";
 import "./Search-bar.css";
+import { cn } from "./utils/cn";
 
 interface Option {
   id: number;
@@ -17,6 +18,8 @@ interface SearchBarProps {
   disabled?: boolean;
   minimizable?: boolean;
   showClearButton?: boolean;
+  clearButtonStyleClass?: string;
+  clearOnSelect?: boolean;
 }
 
 const SearchBar: React.FC<SearchBarProps> = ({
@@ -27,6 +30,9 @@ const SearchBar: React.FC<SearchBarProps> = ({
   onChange,
   disabled,
   showClearButton,
+  clearButtonStyleClass,
+  clearOnSelect,
+  minimizable,
 }) => {
   const [isFocused, setIsFocused] = useState(false);
   const inputRef = useRef(null);
@@ -67,6 +73,11 @@ const SearchBar: React.FC<SearchBarProps> = ({
     onSelect?.(suggestion);
     setShowSuggestions(false);
     setSelectedIndex(-1);
+
+    if (clearOnSelect) {
+      setSearchValue("");
+      setDisplayValue("");
+    }
   };
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
@@ -223,48 +234,58 @@ const SearchBar: React.FC<SearchBarProps> = ({
             />
           </motion.svg>
 
-          <motion.input
-            type="text"
-            placeholder={placeholder || "Search..."}
-            className="p-3 w-full outline-none relative "
-            disabled={disabled}
-            onFocus={() => {
-              setIsFocused(true);
-              if (searchValue.length > 0) {
-                setShowSuggestions(true);
-              }
-            }}
-            onChange={onChangeHandler}
-            value={displayValue}
-            onKeyDown={(e) => handleKeyDown(e)}
-            animate={{
-              paddingLeft: isFocused ? "12px" : "8px",
-            }}
-          />
-          {showClearButton ? (
-            <div className="rounded-sm p-1 mr-2 bg-zinc-100 hover:bg-zinc-200 transition cursor-pointer">
-              <button className="" onClick={clearSearchHandler}>
-                Clear
-              </button>
-            </div>
-          ) : null}
-
-          {isFocused &&
-            dropdownOptions?.length > 0 &&
-            searchValue.length > 0 &&
-            showSuggestions && (
-              <SuggestionDropdown
-                suggestions={suggestionsToDisplay}
-                onSuggestionClick={handleSuggestionClick}
-                hasMoreResults={hasMoreResults}
-                totalResults={
-                  searchValue.length > 0
-                    ? filteredSuggestions.length
-                    : dropdownOptions.length
-                }
-                selectedIndex={selectedIndex}
+          {!minimizable ? (
+            <>
+              <motion.input
+                type="text"
+                placeholder={placeholder || "Search..."}
+                className="p-3 w-full outline-none relative "
+                disabled={disabled}
+                onFocus={() => {
+                  setIsFocused(true);
+                  if (searchValue.length > 0) {
+                    setShowSuggestions(true);
+                  }
+                }}
+                onChange={onChangeHandler}
+                value={displayValue}
+                onKeyDown={(e) => handleKeyDown(e)}
+                animate={{
+                  paddingLeft: isFocused ? "12px" : "8px",
+                }}
               />
-            )}
+              {showClearButton && searchValue.length ? (
+                <div>
+                  <button
+                    className={cn(
+                      "rounded-sm p-1 mr-2 bg-zinc-50 hover:bg-zinc-100 transition cursor-pointer",
+                      clearButtonStyleClass
+                    )}
+                    onClick={clearSearchHandler}
+                  >
+                    Clear
+                  </button>
+                </div>
+              ) : null}
+
+              {isFocused &&
+                dropdownOptions?.length > 0 &&
+                searchValue.length > 0 &&
+                showSuggestions && (
+                  <SuggestionDropdown
+                    suggestions={suggestionsToDisplay}
+                    onSuggestionClick={handleSuggestionClick}
+                    hasMoreResults={hasMoreResults}
+                    totalResults={
+                      searchValue.length > 0
+                        ? filteredSuggestions.length
+                        : dropdownOptions.length
+                    }
+                    selectedIndex={selectedIndex}
+                  />
+                )}
+            </>
+          ) : null}
         </motion.div>
       </motion.div>
     </AnimatePresence>
