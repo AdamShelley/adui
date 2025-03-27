@@ -39,14 +39,16 @@ function App() {
           <h1 className="text-md font-bold text-center text-white mt-10">
             Search Bar
           </h1>
-          <SearchBar
-            dropdownOptions={testSuggestions}
-            maxSuggestions={4}
-            placeholder="This is a placeholder"
-            onSelect={(e) => selectionHandler(e)}
-            onChange={(e) => onInputChangeHandler(e)}
-            showClearButton
-          />
+          <div className="w-1/2">
+            <SearchBar
+              dropdownOptions={testSuggestions}
+              maxSuggestions={4}
+              placeholder="This is a placeholder"
+              onSelect={(e) => selectionHandler(e)}
+              onChange={(e) => onInputChangeHandler(e)}
+              showClearButton
+            />
+          </div>
         </div>
       </main>
     </NoiseBackground>

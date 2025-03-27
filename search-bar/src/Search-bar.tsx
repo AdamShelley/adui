@@ -41,6 +41,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
   const [filteredSuggestions, setFilteredSuggestions] = useState<Option[]>([]);
   const [selectedIndex, setSelectedIndex] = useState(-1);
   const [showSuggestions, setShowSuggestions] = useState(true);
+  const [isMinimized, setIsMinimized] = useState(minimizable);
 
   const filterSuggestions = useCallback(
     (value: string) => {
@@ -176,7 +177,9 @@ const SearchBar: React.FC<SearchBarProps> = ({
   return (
     <AnimatePresence initial={false}>
       <motion.div
-        className="w-full flex justify-center items-center h-16"
+        className={`w-full flex ${
+          minimizable ? "justify-start pl-4" : "justify-center"
+        } items-center h-16`}
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
@@ -187,9 +190,22 @@ const SearchBar: React.FC<SearchBarProps> = ({
           className={`relative flex items-center rounded-lg border box-border bg-white ${
             isFocused ? "border-zinc-500" : "border-zinc-200"
           }`}
-          initial={{ width: "50%" }}
+          initial={{ width: minimizable ? "48px" : "50%" }}
           animate={{
-            width: isFocused ? "51%" : "50%",
+            width: minimizable
+              ? isMinimized
+                ? "60px"
+                : "51%"
+              : isFocused
+              ? "51%"
+              : "50%",
+            height: minimizable
+              ? isMinimized
+                ? "100%"
+                : "100%"
+              : isFocused
+              ? "100%"
+              : "100%",
             borderBottom: isFocused ? "border-zinc-200" : "border-zinc-200",
             boxShadow: isFocused ? "0 5px 10px rgba(0, 0, 0, 0.05)" : "none",
             borderBottomLeftRadius:
@@ -206,13 +222,18 @@ const SearchBar: React.FC<SearchBarProps> = ({
           }}
           transition={{
             type: "spring",
-            stiffness: 500,
+            stiffness: 300,
             damping: 25,
+            originX: 0, // Add this to make it grow from the left
           }}
         >
           <motion.svg
             xmlns="http://www.w3.org/2000/svg"
-            className="h-5 w-5 ml-3 text-gray-400"
+            className={`h-5 w-5 ${
+              minimizable && isMinimized ? "mx-auto" : "ml-3"
+            } text-gray-400 ${minimizable ? "cursor-pointer" : ""} ${
+              isMinimized ? "text-slate-800 font-bold" : ""
+            }`}
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
@@ -225,6 +246,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
               type: "spring",
               stiffness: 500,
             }}
+            onClick={() => minimizable && setIsMinimized(!isMinimized)}
           >
             <path
               strokeLinecap="round"
@@ -234,7 +256,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
             />
           </motion.svg>
 
-          {!minimizable ? (
+          {(!minimizable || !isMinimized) && (
             <>
               <motion.input
                 type="text"
@@ -252,7 +274,11 @@ const SearchBar: React.FC<SearchBarProps> = ({
                 onKeyDown={(e) => handleKeyDown(e)}
                 animate={{
                   paddingLeft: isFocused ? "12px" : "8px",
+                  opacity: 1,
+                  width: "100%",
                 }}
+                initial={{ opacity: 0, width: 0 }}
+                transition={{ duration: 0.3 }}
               />
               {showClearButton && searchValue.length ? (
                 <div>
@@ -285,7 +311,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
                   />
                 )}
             </>
-          ) : null}
+          )}
         </motion.div>
       </motion.div>
     </AnimatePresence>
