@@ -20,6 +20,8 @@ interface SearchBarProps {
   showClearButton?: boolean;
   clearButtonStyleClass?: string;
   clearOnSelect?: boolean;
+  noResultsMessage?: string;
+  filterDebounceTime?: number;
 }
 
 const SearchBar: React.FC<SearchBarProps> = ({
@@ -33,15 +35,21 @@ const SearchBar: React.FC<SearchBarProps> = ({
   clearButtonStyleClass,
   clearOnSelect,
   minimizable,
+  noResultsMessage,
+  filterDebounceTime = 200,
 }) => {
   const [isFocused, setIsFocused] = useState(false);
   const inputRef = useRef(null);
   const [searchValue, setSearchValue] = useState("");
+  const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
   const [displayValue, setDisplayValue] = useState("");
   const [filteredSuggestions, setFilteredSuggestions] = useState<Option[]>([]);
   const [selectedIndex, setSelectedIndex] = useState(-1);
   const [showSuggestions, setShowSuggestions] = useState(true);
   const [isMinimized, setIsMinimized] = useState(minimizable);
+  const [selectedSuggestionId, setSelectedSuggestionId] = useState<
+    number | null
+  >(null);
 
   const filterSuggestions = useCallback(
     (value: string) => {
@@ -56,29 +64,43 @@ const SearchBar: React.FC<SearchBarProps> = ({
 
   const onChangeHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value;
-    setSearchValue(value);
     setDisplayValue(value);
     setShowSuggestions(true);
-    if (value.length > 0) {
-      setFilteredSuggestions(filterSuggestions(value));
-      onChange?.(value);
-    } else {
-      setFilteredSuggestions([]);
+
+    // Clear any existing timeout
+    if (debounceTimerRef.current) {
+      clearTimeout(debounceTimerRef.current);
     }
-    setSelectedIndex(-1);
+
+    // Debounce the actual filtering and state updates
+    debounceTimerRef.current = setTimeout(() => {
+      setSearchValue(value);
+      if (value.length > 0) {
+        setFilteredSuggestions(filterSuggestions(value));
+        onChange?.(value);
+      } else {
+        setFilteredSuggestions([]);
+      }
+      setSelectedIndex(-1);
+    }, filterDebounceTime);
   };
 
   const handleSuggestionClick = (suggestion: Option) => {
+    setSelectedSuggestionId(suggestion.id);
     setSearchValue(suggestion.label);
     setDisplayValue(suggestion.label);
-    onSelect?.(suggestion);
-    setShowSuggestions(false);
-    setSelectedIndex(-1);
 
-    if (clearOnSelect) {
-      setSearchValue("");
-      setDisplayValue("");
-    }
+    setTimeout(() => {
+      onSelect?.(suggestion);
+      setShowSuggestions(false);
+      setSelectedIndex(-1);
+      setSelectedSuggestionId(null);
+
+      if (clearOnSelect) {
+        setSearchValue("");
+        setDisplayValue("");
+      }
+    }, filterDebounceTime);
   };
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
@@ -96,8 +118,20 @@ const SearchBar: React.FC<SearchBarProps> = ({
         );
         if (selectedSuggestion) {
           handleSuggestionClick(selectedSuggestion);
+        } else {
+          setIsFocused(false);
+          const inputElement = inputRef.current as HTMLElement | null;
+          if (inputElement) {
+            inputElement.animate(
+              [
+                { transform: "scale(1)" },
+                { transform: "scale(1.02)" },
+                { transform: "scale(1)" },
+              ],
+              { duration: filterDebounceTime, easing: "ease-in-out" }
+            );
+          }
         }
-        setIsFocused(false);
       }
     } else if (event.key === "ArrowDown") {
       event.preventDefault();
@@ -153,6 +187,10 @@ const SearchBar: React.FC<SearchBarProps> = ({
     document.addEventListener("mousedown", handleClickOutside);
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
+      // Clean up any pending debounce timer
+      if (debounceTimerRef.current) {
+        clearTimeout(debounceTimerRef.current);
+      }
     };
   }, [searchValue]);
 
@@ -224,7 +262,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
             type: "spring",
             stiffness: 300,
             damping: 25,
-            originX: 0, // Add this to make it grow from the left
+            originX: 0,
           }}
         >
           <motion.svg
@@ -302,12 +340,14 @@ const SearchBar: React.FC<SearchBarProps> = ({
                     suggestions={suggestionsToDisplay}
                     onSuggestionClick={handleSuggestionClick}
                     hasMoreResults={hasMoreResults}
+                    noResultsMessage={noResultsMessage}
                     totalResults={
                       searchValue.length > 0
                         ? filteredSuggestions.length
                         : dropdownOptions.length
                     }
                     selectedIndex={selectedIndex}
+                    selectedSuggestionId={selectedSuggestionId}
                   />
                 )}
             </>
@@ -326,6 +366,8 @@ interface SuggestionDropdownProps {
   hasMoreResults?: boolean;
   totalResults?: number;
   selectedIndex?: number;
+  selectedSuggestionId?: number | null;
+  noResultsMessage?: string;
 }
 
 const SuggestionDropdown = ({
@@ -334,6 +376,8 @@ const SuggestionDropdown = ({
   hasMoreResults = false,
   totalResults = 0,
   selectedIndex = -1,
+  selectedSuggestionId = null,
+  noResultsMessage,
 }: SuggestionDropdownProps) => {
   return (
     <AnimatePresence>
@@ -385,9 +429,23 @@ const SuggestionDropdown = ({
                     index === selectedIndex ? "font-medium !bg-zinc-100" : ""
                   }`}
                   initial={{ opacity: 0, x: -10 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: index * 0.03, duration: 0.2 }}
-                  whileTap={{ scale: 0.99 }}
+                  animate={{
+                    opacity: 1,
+                    x: 0,
+                    scale:
+                      selectedSuggestionId === suggestion.id ? [1, 1.05, 1] : 1,
+                    backgroundColor:
+                      selectedSuggestionId === suggestion.id
+                        ? ["#ffffff", "#f3f4f6", "#ffffff"]
+                        : undefined,
+                  }}
+                  transition={{
+                    delay: index * 0.03,
+                    duration: 0.2,
+                    scale: { duration: 0.3 },
+                    backgroundColor: { duration: 0.3 },
+                  }}
+                  whileTap={{ scale: 0.97 }}
                   onClick={() => onSuggestionClick(suggestion)}
                 >
                   {suggestion.label}
@@ -409,7 +467,7 @@ const SuggestionDropdown = ({
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
             >
-              No results found
+              {noResultsMessage?.length ? noResultsMessage : "No results found"}
             </motion.div>
           )}
         </motion.ul>

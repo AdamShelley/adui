@@ -47,6 +47,7 @@ function App() {
               onSelect={(e) => selectionHandler(e)}
               onChange={(e) => onInputChangeHandler(e)}
               showClearButton
+              noResultsMessage="This is a test message"
             />
           </div>
         </div>
