@@ -22,6 +22,7 @@ interface SearchBarProps {
   clearOnSelect?: boolean;
   noResultsMessage?: string;
   filterDebounceTime?: number;
+  renderItem?: (item: Option, isSelected: boolean) => React.ReactNode;
 }
 
 const SearchBar: React.FC<SearchBarProps> = ({
@@ -37,6 +38,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
   minimizable,
   noResultsMessage,
   filterDebounceTime = 200,
+  renderItem,
 }) => {
   const [isFocused, setIsFocused] = useState(false);
   const inputRef = useRef(null);
@@ -341,6 +343,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
                     onSuggestionClick={handleSuggestionClick}
                     hasMoreResults={hasMoreResults}
                     noResultsMessage={noResultsMessage}
+                    renderItem={renderItem}
                     totalResults={
                       searchValue.length > 0
                         ? filteredSuggestions.length
@@ -368,6 +371,7 @@ interface SuggestionDropdownProps {
   selectedIndex?: number;
   selectedSuggestionId?: number | null;
   noResultsMessage?: string;
+  renderItem?: (item: Option, isSelected: boolean) => React.ReactNode;
 }
 
 const SuggestionDropdown = ({
@@ -378,6 +382,7 @@ const SuggestionDropdown = ({
   selectedIndex = -1,
   selectedSuggestionId = null,
   noResultsMessage,
+  renderItem,
 }: SuggestionDropdownProps) => {
   return (
     <AnimatePresence>
@@ -422,35 +427,73 @@ const SuggestionDropdown = ({
         <motion.ul className="p-2">
           {suggestions.length > 0 ? (
             <>
-              {suggestions.map((suggestion, index) => (
-                <motion.li
-                  key={suggestion.id || index}
-                  className={`p-2 hover:bg-gray-100 cursor-pointer rounded-md suggestion-item ${
-                    index === selectedIndex ? "font-medium !bg-zinc-100" : ""
-                  }`}
-                  initial={{ opacity: 0, x: -10 }}
-                  animate={{
-                    opacity: 1,
-                    x: 0,
-                    scale:
-                      selectedSuggestionId === suggestion.id ? [1, 1.05, 1] : 1,
-                    backgroundColor:
-                      selectedSuggestionId === suggestion.id
-                        ? ["#ffffff", "#f3f4f6", "#ffffff"]
-                        : undefined,
-                  }}
-                  transition={{
-                    delay: index * 0.03,
-                    duration: 0.2,
-                    scale: { duration: 0.3 },
-                    backgroundColor: { duration: 0.3 },
-                  }}
-                  whileTap={{ scale: 0.97 }}
-                  onClick={() => onSuggestionClick(suggestion)}
-                >
-                  {suggestion.label}
-                </motion.li>
-              ))}
+              {suggestions.map((suggestion, index) => {
+                const isSelected =
+                  index === selectedIndex ||
+                  selectedSuggestionId === suggestion.id;
+
+                if (renderItem) {
+                  // Wrap custom rendered item in a motion.div to handle animations
+                  return (
+                    <motion.div
+                      key={suggestion.id || index}
+                      initial={{ opacity: 0, x: -10 }}
+                      animate={{
+                        opacity: 1,
+                        x: 0,
+                        scale: isSelected ? [1, 1.05, 1] : 1,
+                        backgroundColor:
+                          selectedSuggestionId === suggestion.id
+                            ? ["#ffffff", "#f3f4f6", "#ffffff"]
+                            : undefined,
+                      }}
+                      transition={{
+                        delay: index * 0.03,
+                        duration: 0.2,
+                        scale: { duration: 0.3 },
+                        backgroundColor: { duration: 0.3 },
+                      }}
+                      whileTap={{ scale: 0.97 }}
+                      onClick={() => onSuggestionClick(suggestion)}
+                      className="cursor-pointer"
+                    >
+                      {renderItem(suggestion, isSelected)}
+                    </motion.div>
+                  );
+                }
+
+                return (
+                  <motion.li
+                    key={suggestion.id || index}
+                    className={`p-2 hover:bg-gray-100 cursor-pointer rounded-md suggestion-item ${
+                      isSelected ? "font-medium !bg-zinc-100" : ""
+                    }`}
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{
+                      opacity: 1,
+                      x: 0,
+                      scale:
+                        selectedSuggestionId === suggestion.id
+                          ? [1, 1.05, 1]
+                          : 1,
+                      backgroundColor:
+                        selectedSuggestionId === suggestion.id
+                          ? ["#ffffff", "#f3f4f6", "#ffffff"]
+                          : undefined,
+                    }}
+                    transition={{
+                      delay: index * 0.03,
+                      duration: 0.2,
+                      scale: { duration: 0.3 },
+                      backgroundColor: { duration: 0.3 },
+                    }}
+                    whileTap={{ scale: 0.97 }}
+                    onClick={() => onSuggestionClick(suggestion)}
+                  >
+                    {suggestion.label}
+                  </motion.li>
+                );
+              })}
               {hasMoreResults && (
                 <motion.div
                   className="text-xs text-gray-500 p-2 text-center border-t border-gray-100 mt-1"
