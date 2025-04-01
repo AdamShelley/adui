@@ -23,6 +23,7 @@ interface SearchBarProps {
   noResultsMessage?: string;
   filterDebounceTime?: number;
   renderItem?: (item: Option, isSelected: boolean) => React.ReactNode;
+  highlightMatches?: boolean;
 }
 
 const SearchBar: React.FC<SearchBarProps> = ({
@@ -39,6 +40,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
   noResultsMessage,
   filterDebounceTime = 200,
   renderItem,
+  highlightMatches,
 }) => {
   const [isFocused, setIsFocused] = useState(false);
   const inputRef = useRef(null);
@@ -344,6 +346,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
                     hasMoreResults={hasMoreResults}
                     noResultsMessage={noResultsMessage}
                     renderItem={renderItem}
+                    searchValue={searchValue}
                     totalResults={
                       searchValue.length > 0
                         ? filteredSuggestions.length
@@ -351,6 +354,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
                     }
                     selectedIndex={selectedIndex}
                     selectedSuggestionId={selectedSuggestionId}
+                    highlightMatches={highlightMatches}
                   />
                 )}
             </>
@@ -369,9 +373,11 @@ interface SuggestionDropdownProps {
   hasMoreResults?: boolean;
   totalResults?: number;
   selectedIndex?: number;
+  searchValue?: string;
   selectedSuggestionId?: number | null;
   noResultsMessage?: string;
   renderItem?: (item: Option, isSelected: boolean) => React.ReactNode;
+  highlightMatches?: boolean;
 }
 
 const SuggestionDropdown = ({
@@ -381,8 +387,10 @@ const SuggestionDropdown = ({
   totalResults = 0,
   selectedIndex = -1,
   selectedSuggestionId = null,
+  searchValue = "",
   noResultsMessage,
   renderItem,
+  highlightMatches,
 }: SuggestionDropdownProps) => {
   return (
     <AnimatePresence>
@@ -490,7 +498,30 @@ const SuggestionDropdown = ({
                     whileTap={{ scale: 0.97 }}
                     onClick={() => onSuggestionClick(suggestion)}
                   >
-                    {suggestion.label}
+                    {highlightMatches ? (
+                      <span>
+                        {suggestion.label
+                          .split(new RegExp(`(${searchValue})`, "i"))
+                          .map((part, i) => {
+                            console.log(part, i);
+                            return (
+                              <span
+                                key={i}
+                                className={
+                                  part.toLowerCase() ===
+                                  searchValue.toLowerCase()
+                                    ? "bg-yellow-200"
+                                    : ""
+                                }
+                              >
+                                {part}
+                              </span>
+                            );
+                          })}
+                      </span>
+                    ) : (
+                      <span>{suggestion.label}</span>
+                    )}
                   </motion.li>
                 );
               })}

@@ -48,12 +48,13 @@ function App() {
               onChange={(e) => onInputChangeHandler(e)}
               showClearButton
               noResultsMessage="This is a test message"
-              renderItem={(item) => (
-                <div className="flex items-center gap-2">
-                  <div className="w-2 h-2 rounded-full bg-blue-500"></div>
-                  <span>{item.label}</span>
-                </div>
-              )}
+              highlightMatches
+              // renderItem={(item) => (
+              //   <div className="flex items-center gap-2">
+              //     <div className="w-2 h-2 rounded-full bg-blue-500"></div>
+              //     <span>{item.label}</span>
+              //   </div>
+              // )}
             />
           </div>
         </div>
