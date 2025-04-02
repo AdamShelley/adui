@@ -24,6 +24,7 @@ interface SearchBarProps {
   filterDebounceTime?: number;
   renderItem?: (item: Option, isSelected: boolean) => React.ReactNode;
   highlightMatches?: boolean;
+  highlightMatchesStyles?: string;
 }
 
 const SearchBar: React.FC<SearchBarProps> = ({
@@ -38,9 +39,10 @@ const SearchBar: React.FC<SearchBarProps> = ({
   clearOnSelect,
   minimizable,
   noResultsMessage,
-  filterDebounceTime = 200,
+  filterDebounceTime = 100,
   renderItem,
   highlightMatches,
+  highlightMatchesStyles,
 }) => {
   const [isFocused, setIsFocused] = useState(false);
   const inputRef = useRef(null);
@@ -239,7 +241,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
                 ? "60px"
                 : "51%"
               : isFocused
-              ? "51%"
+              ? "53%"
               : "50%",
             height: minimizable
               ? isMinimized
@@ -355,6 +357,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
                     selectedIndex={selectedIndex}
                     selectedSuggestionId={selectedSuggestionId}
                     highlightMatches={highlightMatches}
+                    highlightMatchesStyles={highlightMatchesStyles}
                   />
                 )}
             </>
@@ -378,6 +381,7 @@ interface SuggestionDropdownProps {
   noResultsMessage?: string;
   renderItem?: (item: Option, isSelected: boolean) => React.ReactNode;
   highlightMatches?: boolean;
+  highlightMatchesStyles?: string;
 }
 
 const SuggestionDropdown = ({
@@ -391,6 +395,7 @@ const SuggestionDropdown = ({
   noResultsMessage,
   renderItem,
   highlightMatches,
+  highlightMatchesStyles,
 }: SuggestionDropdownProps) => {
   return (
     <AnimatePresence>
@@ -503,14 +508,17 @@ const SuggestionDropdown = ({
                         {suggestion.label
                           .split(new RegExp(`(${searchValue})`, "i"))
                           .map((part, i) => {
-                            console.log(part, i);
                             return (
                               <span
                                 key={i}
                                 className={
                                   part.toLowerCase() ===
                                   searchValue.toLowerCase()
-                                    ? "bg-yellow-200"
+                                    ? `${
+                                        highlightMatchesStyles
+                                          ? highlightMatchesStyles
+                                          : "bg-yellow-200"
+                                      }`
                                     : ""
                                 }
                               >
