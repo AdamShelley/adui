@@ -17,14 +17,14 @@ const NoiseBackground = ({
       /> */}
 
       {/* Noise texture overlay */}
-      <div
+      {/* <div
         className="absolute inset-0 w-full h-full opacity-[6%]"
         style={{
           backgroundImage: `url("/noise-texture.png")`,
           backgroundRepeat: "repeat",
           backgroundSize: "200px",
         }}
-      />
+      /> */}
 
       {/* Content container */}
       <div className="relative z-20">{children}</div>

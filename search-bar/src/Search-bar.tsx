@@ -25,6 +25,7 @@ interface SearchBarProps {
   renderItem?: (item: Option, isSelected: boolean) => React.ReactNode;
   highlightMatches?: boolean;
   highlightMatchesStyles?: string;
+  customLoader?: React.ReactNode;
 }
 
 const SearchBar: React.FC<SearchBarProps> = ({
@@ -43,6 +44,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
   renderItem,
   highlightMatches,
   highlightMatchesStyles,
+  customLoader,
 }) => {
   const [isFocused, setIsFocused] = useState(false);
   const inputRef = useRef(null);
@@ -358,6 +360,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
                     selectedSuggestionId={selectedSuggestionId}
                     highlightMatches={highlightMatches}
                     highlightMatchesStyles={highlightMatchesStyles}
+                    customLoader={customLoader}
                   />
                 )}
             </>
@@ -382,6 +385,7 @@ interface SuggestionDropdownProps {
   renderItem?: (item: Option, isSelected: boolean) => React.ReactNode;
   highlightMatches?: boolean;
   highlightMatchesStyles?: string;
+  customLoader?: React.ReactNode;
 }
 
 const SuggestionDropdown = ({
@@ -396,6 +400,7 @@ const SuggestionDropdown = ({
   renderItem,
   highlightMatches,
   highlightMatchesStyles,
+  customLoader,
 }: SuggestionDropdownProps) => {
   return (
     <AnimatePresence>
@@ -544,13 +549,25 @@ const SuggestionDropdown = ({
               )}
             </>
           ) : (
-            <motion.div
-              className="p-2 text-gray-500 text-center"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-            >
-              {noResultsMessage?.length ? noResultsMessage : "No results found"}
-            </motion.div>
+            <>
+              <motion.div
+                className="p-2 text-gray-500 text-center"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+              >
+                {customLoader}
+              </motion.div>
+
+              <motion.div
+                className="p-2 text-gray-500 text-center"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+              >
+                {noResultsMessage?.length
+                  ? noResultsMessage
+                  : "No results found"}
+              </motion.div>
+            </>
           )}
         </motion.ul>
       </motion.div>
