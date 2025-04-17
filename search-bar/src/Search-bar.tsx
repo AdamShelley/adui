@@ -279,18 +279,18 @@ const SearchBar: React.FC<SearchBarProps> = ({
               minimizable && isMinimized ? "mx-auto" : "ml-3"
             } text-gray-400 ${minimizable ? "cursor-pointer" : ""} ${
               isMinimized ? "text-slate-800 font-bold" : ""
-            }`}
+            } flex-shrink-0 min-w-[20px]`}
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
             initial={{ scale: 1 }}
             animate={{
-              scale: isFocused ? 1.1 : 1,
               rotate: isFocused ? 0 : -5,
             }}
             transition={{
               type: "spring",
               stiffness: 500,
+              damping: 30,
             }}
             onClick={() => minimizable && setIsMinimized(!isMinimized)}
           >
@@ -307,7 +307,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
               <motion.input
                 type="text"
                 placeholder={placeholder || "Search..."}
-                className="p-3 w-full outline-none relative "
+                className="p-3 w-full outline-none relative"
                 disabled={disabled}
                 onFocus={() => {
                   setIsFocused(true);
@@ -319,26 +319,38 @@ const SearchBar: React.FC<SearchBarProps> = ({
                 value={displayValue}
                 onKeyDown={(e) => handleKeyDown(e)}
                 animate={{
-                  paddingLeft: isFocused ? "12px" : "8px",
+                  paddingLeft: "8px",
                   opacity: 1,
                   width: "100%",
                 }}
                 initial={{ opacity: 0, width: 0 }}
                 transition={{ duration: 0.3 }}
               />
-              {showClearButton && searchValue.length ? (
-                <div>
-                  <button
-                    className={cn(
-                      "rounded-sm p-1 mr-2 bg-zinc-50 hover:bg-zinc-100 transition cursor-pointer",
-                      clearButtonStyleClass
-                    )}
-                    onClick={clearSearchHandler}
+              <AnimatePresence>
+                {showClearButton && searchValue.length ? (
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.8 }}
+                    transition={{
+                      type: "spring",
+                      stiffness: 300,
+                      damping: 25,
+                    }}
+                    key="clear-button"
                   >
-                    Clear
-                  </button>
-                </div>
-              ) : null}
+                    <button
+                      className={cn(
+                        "rounded-sm p-1 mr-2 bg-zinc-50 hover:bg-zinc-100 transition cursor-pointer",
+                        clearButtonStyleClass
+                      )}
+                      onClick={clearSearchHandler}
+                    >
+                      Clear
+                    </button>
+                  </motion.div>
+                ) : null}
+              </AnimatePresence>
 
               {isFocused &&
                 dropdownOptions?.length > 0 &&
