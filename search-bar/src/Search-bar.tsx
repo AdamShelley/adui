@@ -270,7 +270,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
             type: "spring",
             stiffness: 300,
             damping: 25,
-            originX: 0,
+            originX: minimizable ? 0 : 0.5,
           }}
         >
           <motion.svg

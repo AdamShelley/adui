@@ -41,7 +41,7 @@ function App() {
           <h1 className="text-md font-bold text-center text-white mt-10">
             Search Bar
           </h1>
-          <div className="w-1/2">
+          <div className="w-full max-w-3xl px-4">
             <SearchBar
               dropdownOptions={testSuggestions}
               maxSuggestions={4}
@@ -51,6 +51,7 @@ function App() {
               showClearButton
               clearButtonStyleClass="bg-gray-50 p-2"
               noResultsMessage="No results found"
+              // minimizable
               // highlightMatches
               // highlightMatchesStyles="bg-blue-200 text-black"
               // renderItem={(item) => (
