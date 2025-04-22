@@ -43,7 +43,7 @@ function App() {
           </h1>
           <div className="w-full max-w-3xl px-4">
             <SearchBar
-              dropdownOptions={testSuggestions}
+              dropdownOptions={emptySuggestions}
               maxSuggestions={4}
               placeholder="This is a placeholder"
               onSelect={(e) => selectionHandler(e)}

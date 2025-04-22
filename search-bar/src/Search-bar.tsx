@@ -255,14 +255,17 @@ const SearchBar: React.FC<SearchBarProps> = ({
             borderBottom: isFocused ? "border-zinc-200" : "border-zinc-200",
             boxShadow: isFocused ? "0 5px 10px rgba(0, 0, 0, 0.05)" : "none",
             borderBottomLeftRadius:
-              isFocused && showSuggestions && searchValue.length > 0
+              isFocused &&
+              showSuggestions &&
+              searchValue.length > 0 &&
+              dropdownOptions.length > 0
                 ? 0
                 : "0.375rem",
             borderBottomRightRadius:
               isFocused &&
               showSuggestions &&
               searchValue.length > 0 &&
-              suggestionsToDisplay.length > 0
+              dropdownOptions.length > 0
                 ? 0
                 : "0.375rem",
           }}
