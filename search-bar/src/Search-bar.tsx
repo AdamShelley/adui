@@ -222,6 +222,18 @@ const SearchBar: React.FC<SearchBarProps> = ({
 
   return (
     <AnimatePresence initial={false}>
+      <div aria-live="polite" className="sr-only" role="status">
+        {suggestionsToDisplay.length > 0
+          ? `${suggestionsToDisplay.length} suggestions available.${
+              selectedIndex >= 0
+                ? ` ${suggestionsToDisplay[selectedIndex]?.label} selected.`
+                : ""
+            }`
+          : searchValue.length > 0
+          ? "No suggestions available."
+          : ""}
+      </div>
+
       <motion.div
         className={`w-full flex ${
           minimizable ? "justify-start pl-4" : "justify-center"
@@ -233,6 +245,12 @@ const SearchBar: React.FC<SearchBarProps> = ({
       >
         <motion.div
           ref={inputRef}
+          role="combobox"
+          aria-expanded={
+            isFocused && showSuggestions && suggestionsToDisplay.length > 0
+          }
+          aria-owns="search-suggestions"
+          aria-haspopup="listbox"
           className={`relative flex items-center rounded-lg border box-border bg-white ${
             isFocused ? "border-zinc-500" : "border-zinc-200"
           }`}
@@ -309,6 +327,14 @@ const SearchBar: React.FC<SearchBarProps> = ({
             <>
               <motion.input
                 type="text"
+                aria-label={placeholder || "Search"}
+                aria-autocomplete="list"
+                aria-controls="search-suggestions"
+                aria-activedescendant={
+                  selectedIndex >= 0
+                    ? `suggestion-${suggestionsToDisplay[selectedIndex]?.id}`
+                    : undefined
+                }
                 placeholder={placeholder || "Search..."}
                 className="p-3 w-full outline-none relative"
                 disabled={disabled}
@@ -457,7 +483,12 @@ const SuggestionDropdown = ({
           },
         }}
       >
-        <motion.ul className="p-2">
+        <motion.ul
+          className="p-2"
+          id="search-suggestions"
+          role="listbox"
+          aria-label="Search suggestions"
+        >
           {suggestions.length > 0 ? (
             <>
               {suggestions.map((suggestion, index) => {
@@ -470,6 +501,9 @@ const SuggestionDropdown = ({
                   return (
                     <motion.div
                       key={suggestion.id || index}
+                      role="option"
+                      aria-selected={isSelected}
+                      id={`suggestion-${suggestion.id}`}
                       initial={{ opacity: 0, x: -10 }}
                       animate={{
                         opacity: 1,
@@ -501,6 +535,9 @@ const SuggestionDropdown = ({
                     className={`p-2 hover:bg-gray-100 cursor-pointer rounded-md suggestion-item ${
                       isSelected ? "font-medium !bg-zinc-100" : ""
                     }`}
+                    role="option"
+                    id={`suggestion-${suggestion.id}`}
+                    aria-selected={isSelected}
                     initial={{ opacity: 0, x: -10 }}
                     animate={{
                       opacity: 1,
