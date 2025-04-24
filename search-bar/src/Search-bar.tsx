@@ -75,12 +75,10 @@ const SearchBar: React.FC<SearchBarProps> = ({
     setDisplayValue(value);
     setShowSuggestions(true);
 
-    // Clear any existing timeout
     if (debounceTimerRef.current) {
       clearTimeout(debounceTimerRef.current);
     }
 
-    // Debounce the actual filtering and state updates
     debounceTimerRef.current = setTimeout(() => {
       setSearchValue(value);
       if (value.length > 0) {
@@ -95,20 +93,26 @@ const SearchBar: React.FC<SearchBarProps> = ({
 
   const handleSuggestionClick = (suggestion: Option) => {
     setSelectedSuggestionId(suggestion.id);
-    setSearchValue(suggestion.label);
-    setDisplayValue(suggestion.label);
 
     setTimeout(() => {
-      onSelect?.(suggestion);
+      setSearchValue(suggestion.label);
+      setDisplayValue(suggestion.label);
       setShowSuggestions(false);
+      onSelect?.(suggestion);
       setSelectedIndex(-1);
-      setSelectedSuggestionId(null);
 
       if (clearOnSelect) {
-        setSearchValue("");
-        setDisplayValue("");
+        requestAnimationFrame(() => {
+          setSearchValue("");
+          setDisplayValue("");
+          setSelectedSuggestionId(null);
+        });
+      } else {
+        setTimeout(() => {
+          setSelectedSuggestionId(null);
+        }, 300);
       }
-    }, filterDebounceTime);
+    }, 200);
   };
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
@@ -457,29 +461,28 @@ const SuggestionDropdown = ({
           opacity: 0,
           height: 0,
           scaleY: 0.8,
-          y: -5,
         }}
         animate={{
-          opacity: 1,
+          opacity: selectedSuggestionId ? [1, 0.8, 0] : 1, // Fade the entire box when selection made
           height: "auto",
           scaleY: 1,
-          y: 0,
         }}
         transition={{
           type: "spring",
           stiffness: 400,
           damping: 30,
-          duration: 0.3,
-          opacity: { duration: 0.2 },
-          height: { duration: 0.25 },
+          opacity: selectedSuggestionId
+            ? { duration: 0.2, times: [0, 0.5, 1] }
+            : { duration: 0.15 },
+          height: { duration: 0.2 },
         }}
         exit={{
           opacity: 0,
           height: 0,
           scaleY: 0.8,
           transition: {
-            duration: 0.2,
-            height: { duration: 0.15 },
+            duration: 0.15,
+            height: { duration: 0.1 },
           },
         }}
       >
@@ -497,30 +500,33 @@ const SuggestionDropdown = ({
                   selectedSuggestionId === suggestion.id;
 
                 if (renderItem) {
-                  // Wrap custom rendered item in a motion.div to handle animations
                   return (
                     <motion.div
                       key={suggestion.id || index}
                       role="option"
                       aria-selected={isSelected}
                       id={`suggestion-${suggestion.id}`}
-                      initial={{ opacity: 0, x: -10 }}
+                      initial={{ opacity: 0, x: -5 }}
                       animate={{
-                        opacity: 1,
+                        opacity:
+                          selectedSuggestionId &&
+                          selectedSuggestionId !== suggestion.id
+                            ? 0
+                            : 1,
                         x: 0,
-                        scale: isSelected ? [1, 1.05, 1] : 1,
+                        scale: isSelected ? 1.01 : 1,
                         backgroundColor:
                           selectedSuggestionId === suggestion.id
-                            ? ["#ffffff", "#f3f4f6", "#ffffff"]
+                            ? "#f3f4f6"
                             : undefined,
                       }}
                       transition={{
-                        delay: index * 0.03,
-                        duration: 0.2,
-                        scale: { duration: 0.3 },
-                        backgroundColor: { duration: 0.3 },
+                        delay: index * 0.02,
+                        duration: 0.15,
+                        scale: { duration: 0.2 },
+                        opacity: { duration: 0.1 },
                       }}
-                      whileTap={{ scale: 0.97 }}
+                      whileTap={{ scale: 0.98 }}
                       onClick={() => onSuggestionClick(suggestion)}
                       className="cursor-pointer"
                     >
@@ -538,26 +544,27 @@ const SuggestionDropdown = ({
                     role="option"
                     id={`suggestion-${suggestion.id}`}
                     aria-selected={isSelected}
-                    initial={{ opacity: 0, x: -10 }}
+                    initial={{ opacity: 0, x: -5 }}
                     animate={{
-                      opacity: 1,
-                      x: 0,
-                      scale:
-                        selectedSuggestionId === suggestion.id
-                          ? [1, 1.05, 1]
+                      opacity:
+                        selectedSuggestionId &&
+                        selectedSuggestionId !== suggestion.id
+                          ? 0
                           : 1,
+                      x: 0,
+                      scale: selectedSuggestionId === suggestion.id ? 1.01 : 1,
                       backgroundColor:
                         selectedSuggestionId === suggestion.id
-                          ? ["#ffffff", "#f3f4f6", "#ffffff"]
+                          ? "#f3f4f6"
                           : undefined,
                     }}
                     transition={{
-                      delay: index * 0.03,
-                      duration: 0.2,
-                      scale: { duration: 0.3 },
-                      backgroundColor: { duration: 0.3 },
+                      delay: index * 0.02,
+                      duration: 0.15,
+                      backgroundColor: { duration: 0.2 },
+                      opacity: { duration: 0.1 },
                     }}
-                    whileTap={{ scale: 0.97 }}
+                    whileTap={{ scale: 0.98 }}
                     onClick={() => onSuggestionClick(suggestion)}
                   >
                     {highlightMatches ? (
