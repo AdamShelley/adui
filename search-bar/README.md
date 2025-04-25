@@ -1,54 +1,69 @@
-# React + TypeScript + Vite
+# Search Bar Component for React
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A customizable, accessible and animated search bar component for React applications.
 
-Currently, two official plugins are available:
+## Installation
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+### Using npm
 
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+```bash
+npm install @adamui/search-bar
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+### Using bun
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default tseslint.config({
-  plugins: {
-    // Add the react-x and react-dom plugins
-    'react-x': reactX,
-    'react-dom': reactDom,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended typescript rules
-    ...reactX.configs['recommended-typescript'].rules,
-    ...reactDom.configs.recommended.rules,
-  },
-})
+```bash
+bun add @adamui/search-bar
 ```
+
+## Basic Usage
+
+```jsx
+import SearchBar from "@adamui/search-bar";
+import "@adamui/search-bar/dist/styles.css";
+
+function App() {
+  const options = [
+    { id: 1, label: "Apple" },
+    { id: 2, label: "Banana" },
+    { id: 3, label: "Cherry" },
+    // more options...
+  ];
+
+  const handleSelect = (option) => {
+    console.log("Selected:", option);
+  };
+
+  return (
+    <div className="app">
+      <SearchBar
+        dropdownOptions={options}
+        placeholder="Search fruits..."
+        onSelect={handleSelect}
+        highlightMatches={true}
+      />
+    </div>
+  );
+}
+```
+
+## Props Reference
+
+| Prop                     | Type                                                                            | Default              | Description                                      |
+| ------------------------ | ------------------------------------------------------------------------------- | -------------------- | ------------------------------------------------ |
+| `dropdownOptions`        | `Array<{ id: number, label: string }>`                                          | `[]`                 | Array of options to display in the dropdown      |
+| `maxSuggestions`         | `number`                                                                        | `5`                  | Maximum number of suggestions to display         |
+| `placeholder`            | `string`                                                                        | `"Search..."`        | Placeholder text for the search input            |
+| `onSelect`               | `(option: { id: number, label: string }) => void`                               | -                    | Callback when an option is selected              |
+| `onChange`               | `(inputValue: string) => void`                                                  | -                    | Callback when the input value changes            |
+| `disabled`               | `boolean`                                                                       | `false`              | Disables the search input                        |
+| `minimizable`            | `boolean`                                                                       | `false`              | Allows the search bar to be minimized to an icon |
+| `showClearButton`        | `boolean`                                                                       | `false`              | Shows a clear button when text is entered        |
+| `clearButtonStyleClass`  | `string`                                                                        | -                    | Custom CSS class for the clear button            |
+| `clearOnSelect`          | `boolean`                                                                       | `false`              | Clears the input after selection                 |
+| `noResultsMessage`       | `string`                                                                        | `"No results found"` | Message to display when no results match         |
+| `filterDebounceTime`     | `number`                                                                        | `100`                | Debounce time in ms for filtering suggestions    |
+| `renderItem`             | `(item: { id: number, label: string }, isSelected: boolean) => React.ReactNode` | -                    | Custom renderer for dropdown items               |
+| `highlightMatches`       | `boolean`                                                                       | `false`              | Highlights matching text in suggestions          |
+| `highlightMatchesStyles` | `string`                                                                        | `"bg-yellow-200"`    | CSS class for highlighted text                   |
+| `customLoader`           | `React.ReactNode`                                                               | -                    | Custom loader component                          |
