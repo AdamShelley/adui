@@ -7,20 +7,20 @@ A customizable, accessible and animated search bar component for React applicati
 ### Using npm
 
 ```bash
-npm install @adamui/search-bar
+npm install @adui/search-bar
 ```
 
 ### Using bun
 
 ```bash
-bun add @adamui/search-bar
+bun add @adui/search-bar
 ```
 
 ## Basic Usage
 
 ```jsx
-import SearchBar from "@adamui/search-bar";
-import "@adamui/search-bar/dist/styles.css";
+import SearchBar from "@adui/search-bar";
+import "@adui/search-bar/dist/styles.css";
 
 function App() {
   const options = [
