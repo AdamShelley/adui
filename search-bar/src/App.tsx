@@ -1,4 +1,4 @@
-import SearchBar from "./Search-bar";
+import SearchBar from "./SearchBar";
 import "./App.css";
 import NoiseBackground from "./noise";
 
@@ -22,8 +22,6 @@ const testSuggestions = [
   { id: 16, label: "Kiwi" },
   { id: 17, label: "Papaya" },
 ];
-
-const emptySuggestions = [];
 
 function App() {
   const selectionHandler = (selectedOption: { id: number; label: string }) => {
