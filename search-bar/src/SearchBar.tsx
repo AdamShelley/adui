@@ -1,34 +1,16 @@
+import * as React from "react";
 import { AnimatePresence } from "motion/react";
 import * as motion from "motion/react-client";
 import { useState, useRef, useEffect, useCallback } from "react";
-import "./Search-bar.css";
+import "./SearchBar.css";
 import { cn } from "./utils/cn";
+import {
+  Option,
+  SearchBarProps,
+  SuggestionDropdownProps,
+} from "./types/SearchBarTypes";
 
-interface Option {
-  id: number;
-  label: string;
-}
-
-interface SearchBarProps {
-  dropdownOptions?: Option[];
-  maxSuggestions?: number;
-  placeholder?: string;
-  onSelect?: (selectedOption: Option) => void;
-  onChange?: (inputValue: string) => void;
-  disabled?: boolean;
-  minimizable?: boolean;
-  showClearButton?: boolean;
-  clearButtonStyleClass?: string;
-  clearOnSelect?: boolean;
-  noResultsMessage?: string;
-  filterDebounceTime?: number;
-  renderItem?: (item: Option, isSelected: boolean) => React.ReactNode;
-  highlightMatches?: boolean;
-  highlightMatchesStyles?: string;
-  customLoader?: React.ReactNode;
-}
-
-const SearchBar: React.FC<SearchBarProps> = ({
+export const SearchBar: React.FC<SearchBarProps> = ({
   dropdownOptions = [],
   maxSuggestions = 5,
   placeholder,
@@ -415,23 +397,6 @@ const SearchBar: React.FC<SearchBarProps> = ({
     </AnimatePresence>
   );
 };
-
-export default SearchBar;
-
-interface SuggestionDropdownProps {
-  suggestions: Option[];
-  onSuggestionClick: (suggestion: Option) => void;
-  hasMoreResults?: boolean;
-  totalResults?: number;
-  selectedIndex?: number;
-  searchValue?: string;
-  selectedSuggestionId?: number | null;
-  noResultsMessage?: string;
-  renderItem?: (item: Option, isSelected: boolean) => React.ReactNode;
-  highlightMatches?: boolean;
-  highlightMatchesStyles?: string;
-  customLoader?: React.ReactNode;
-}
 
 const SuggestionDropdown = ({
   suggestions,
