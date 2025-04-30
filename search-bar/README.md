@@ -12,6 +12,8 @@ A customizable React search bar component with advanced features, animations, an
 - ⏱️ Debounced input for performance
 - 🧩 Custom rendering of suggestion items
 - ♿ Accessible with ARIA attributes
+- 🌓 Dark mode support with system preference detection
+- 📏 Standardized dimensions for consistent UI
 
 ## Installation
 
@@ -29,15 +31,6 @@ pnpm add @adamui/searchbar
 bun add @adamui/searchbar
 ```
 
-### Importing Styles
-
-Make sure to import the CSS file in your application:
-
-```jsx
-// Import the component's styles
-import "@adamui/searchbar/dist/style.css";
-```
-
 ### Peer Dependencies
 
 This package requires the following peer dependencies:
@@ -50,7 +43,6 @@ This package requires the following peer dependencies:
 
 ```tsx
 import { SearchBar } from "@adamui/searchbar";
-import "@adamui/searchbar/dist/style.css";
 
 // Basic usage
 const MyComponent = () => {
@@ -91,6 +83,9 @@ const AdvancedSearch = () => {
       highlightMatchesStyles="bg-blue-200 font-medium"
       filterDebounceTime={300}
       noResultsMessage="No matching items found"
+      width="500px"
+      height="56px"
+      darkMode={true}
       renderItem={(item, isSelected) => (
         <div className={`p-2 ${isSelected ? "bg-blue-100" : ""}`}>
           <div className="font-medium">{item.label}</div>
@@ -122,6 +117,9 @@ const AdvancedSearch = () => {
 | `highlightMatches`       | `boolean`                                                | `false`              | Whether to highlight matching text                      |
 | `highlightMatchesStyles` | `string`                                                 | `"bg-yellow-200"`    | Tailwind classes for highlighted text                   |
 | `customLoader`           | `React.ReactNode`                                        | -                    | Custom loader element                                   |
+| `width`                  | `string`                                                 | `"400px"`            | Width of the search bar                                 |
+| `height`                 | `string`                                                 | `"48px"`             | Height of the search bar                                |
+| `darkMode`               | `boolean`                                                | `undefined`          | Force dark mode (true/false) or auto-detect (undefined) |
 
 ## License
 

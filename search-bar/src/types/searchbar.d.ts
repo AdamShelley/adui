@@ -1,12 +1,14 @@
-import { FC, ReactNode } from "react";
+import { FC } from "react";
 import {
   Option,
   SearchBarProps,
   SuggestionDropdownProps,
 } from "./SearchBarTypes";
 
-// Component export
+// Component exports
 export declare const SearchBar: FC<SearchBarProps>;
+declare const DefaultSearchBar: FC<SearchBarProps>;
+export default DefaultSearchBar;
 
 // Type exports
 export type { Option, SearchBarProps, SuggestionDropdownProps };

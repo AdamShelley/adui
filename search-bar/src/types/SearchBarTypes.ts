@@ -22,6 +22,9 @@ export interface SearchBarProps {
   highlightMatches?: boolean;
   highlightMatchesStyles?: string;
   customLoader?: React.ReactNode;
+  width?: string;
+  height?: string;
+  darkMode?: boolean;
 }
 
 export interface SuggestionDropdownProps {

@@ -27,6 +27,9 @@ export const SearchBar: React.FC<SearchBarProps> = ({
   highlightMatches,
   highlightMatchesStyles,
   customLoader,
+  width = "400px",
+  height = "48px",
+  darkMode,
 }) => {
   const [isFocused, setIsFocused] = useState(false);
   const inputRef = useRef(null);
@@ -40,6 +43,29 @@ export const SearchBar: React.FC<SearchBarProps> = ({
   const [selectedSuggestionId, setSelectedSuggestionId] = useState<
     number | null
   >(null);
+
+  // Detect system dark mode if darkMode prop is not explicitly provided
+  const [systemDarkMode, setSystemDarkMode] = useState(false);
+
+  useEffect(() => {
+    if (darkMode === undefined) {
+      const darkModeMediaQuery = window.matchMedia(
+        "(prefers-color-scheme: dark)"
+      );
+      setSystemDarkMode(darkModeMediaQuery.matches);
+
+      const handleChange = (e: MediaQueryListEvent) => {
+        setSystemDarkMode(e.matches);
+      };
+
+      darkModeMediaQuery.addEventListener("change", handleChange);
+      return () =>
+        darkModeMediaQuery.removeEventListener("change", handleChange);
+    }
+  }, [darkMode]);
+
+  // Use explicit prop if provided, otherwise use detected system setting
+  const isDarkMode = darkMode !== undefined ? darkMode : systemDarkMode;
 
   const filterSuggestions = useCallback(
     (value: string) => {
@@ -223,7 +249,8 @@ export const SearchBar: React.FC<SearchBarProps> = ({
       <motion.div
         className={`w-full flex ${
           minimizable ? "justify-start pl-4" : "justify-center"
-        } items-center h-16`}
+        } items-center`}
+        style={{ height }}
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
@@ -237,27 +264,47 @@ export const SearchBar: React.FC<SearchBarProps> = ({
           }
           aria-owns="search-suggestions"
           aria-haspopup="listbox"
-          className={`relative flex items-center rounded-lg border box-border bg-white ${
-            isFocused ? "border-zinc-500" : "border-zinc-200"
+          className={`relative flex items-center rounded-lg border box-border ${
+            isDarkMode
+              ? "bg-zinc-800 border-zinc-600"
+              : "bg-white border-zinc-200"
+          } ${
+            isFocused
+              ? isDarkMode
+                ? "border-zinc-400"
+                : "border-zinc-500"
+              : isDarkMode
+              ? "border-zinc-700"
+              : "border-zinc-200"
           }`}
-          initial={{ width: minimizable ? "48px" : "50%" }}
+          initial={{ width: minimizable ? "48px" : width }}
           animate={{
             width: minimizable
               ? isMinimized
                 ? "60px"
-                : "51%"
+                : width
               : isFocused
-              ? "53%"
-              : "50%",
+              ? `calc(${width} + 12px)`
+              : width,
             height: minimizable
               ? isMinimized
-                ? "100%"
-                : "100%"
+                ? height
+                : height
               : isFocused
-              ? "100%"
-              : "100%",
-            borderBottom: isFocused ? "border-zinc-200" : "border-zinc-200",
-            boxShadow: isFocused ? "0 5px 10px rgba(0, 0, 0, 0.05)" : "none",
+              ? height
+              : height,
+            borderBottom: isFocused
+              ? isDarkMode
+                ? "border-zinc-700"
+                : "border-zinc-200"
+              : isDarkMode
+              ? "border-zinc-700"
+              : "border-zinc-200",
+            boxShadow: isFocused
+              ? isDarkMode
+                ? "0 5px 10px rgba(0, 0, 0, 0.2)"
+                : "0 5px 10px rgba(0, 0, 0, 0.05)"
+              : "none",
             borderBottomLeftRadius:
               isFocused &&
               showSuggestions &&
@@ -280,34 +327,44 @@ export const SearchBar: React.FC<SearchBarProps> = ({
             originX: minimizable ? 0 : 0.5,
           }}
         >
-          <motion.svg
-            xmlns="http://www.w3.org/2000/svg"
-            className={`h-5 w-5 ${
-              minimizable && isMinimized ? "mx-auto" : "ml-3"
-            } text-gray-400 ${minimizable ? "cursor-pointer" : ""} ${
-              isMinimized ? "text-slate-800 font-bold" : ""
-            } flex-shrink-0 min-w-[20px]`}
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            initial={{ scale: 1 }}
-            animate={{
-              rotate: isFocused ? 0 : -5,
-            }}
-            transition={{
-              type: "spring",
-              stiffness: 500,
-              damping: 30,
-            }}
-            onClick={() => minimizable && setIsMinimized(!isMinimized)}
+          {/* Improved SVG icon alignment */}
+          <div
+            className={cn(
+              "flex items-center justify-center",
+              minimizable && isMinimized ? "mx-auto" : "ml-3 mr-1"
+            )}
           >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className={cn(
+                "flex-shrink-0",
+                isDarkMode ? "text-zinc-400" : "text-gray-400",
+                minimizable ? "cursor-pointer" : "",
+                isMinimized
+                  ? isDarkMode
+                    ? "text-zinc-300"
+                    : "text-slate-800"
+                  : ""
+              )}
+              style={{
+                width: "16px",
+                height: "16px",
+                minWidth: "16px",
+                maxWidth: "16px",
+              }}
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
               strokeWidth={2}
-              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-            />
-          </motion.svg>
+              onClick={() => minimizable && setIsMinimized(!isMinimized)}
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+              />
+            </svg>
+          </div>
 
           {(!minimizable || !isMinimized) && (
             <>
@@ -322,7 +379,11 @@ export const SearchBar: React.FC<SearchBarProps> = ({
                     : undefined
                 }
                 placeholder={placeholder || "Search..."}
-                className="p-3 w-full outline-none relative"
+                className={`p-3 w-full outline-none relative ${
+                  isDarkMode
+                    ? "bg-zinc-800 text-zinc-100 placeholder-zinc-400"
+                    : "text-zinc-800 placeholder-gray-400"
+                }`}
                 disabled={disabled}
                 onFocus={() => {
                   setIsFocused(true);
@@ -340,6 +401,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({
                 }}
                 initial={{ opacity: 0, width: 0 }}
                 transition={{ duration: 0.3 }}
+                style={{ fontSize: "14px" }}
               />
               <AnimatePresence>
                 {showClearButton && searchValue.length ? (
@@ -356,7 +418,11 @@ export const SearchBar: React.FC<SearchBarProps> = ({
                   >
                     <button
                       className={cn(
-                        "rounded-sm p-1 mr-2 bg-zinc-50 hover:bg-zinc-100 transition cursor-pointer",
+                        `rounded-sm p-1 mr-2 transition cursor-pointer text-xs ${
+                          isDarkMode
+                            ? "bg-zinc-700 hover:bg-zinc-600 text-zinc-200"
+                            : "bg-zinc-50 hover:bg-zinc-100 text-zinc-800"
+                        }`,
                         clearButtonStyleClass
                       )}
                       onClick={clearSearchHandler}
@@ -388,6 +454,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({
                     highlightMatches={highlightMatches}
                     highlightMatchesStyles={highlightMatchesStyles}
                     customLoader={customLoader}
+                    isDarkMode={isDarkMode}
                   />
                 )}
             </>
@@ -398,6 +465,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({
   );
 };
 
+// Update SuggestionDropdown props to include isDarkMode
 const SuggestionDropdown = ({
   suggestions,
   onSuggestionClick,
@@ -411,16 +479,22 @@ const SuggestionDropdown = ({
   highlightMatches,
   highlightMatchesStyles,
   customLoader,
-}: SuggestionDropdownProps) => {
+  isDarkMode = false,
+}: SuggestionDropdownProps & { isDarkMode?: boolean }) => {
   return (
     <AnimatePresence>
       <motion.div
-        className="absolute w-full bg-white shadow-lg top-full left-0 right-0 rounded-b-xl border border-t-0 border-zinc-500 box-border overflow-hidden"
+        className={`absolute w-full shadow-lg top-full left-0 right-0 rounded-b-xl border border-t-0 box-border overflow-hidden ${
+          isDarkMode
+            ? "bg-zinc-800 border-zinc-600"
+            : "bg-white border-zinc-500"
+        }`}
         style={{
           top: "calc(100% - 1px)",
           width: "calc(100% + 2px)",
           marginLeft: "-1px",
           transformOrigin: "top",
+          fontSize: "14px",
         }}
         initial={{
           opacity: 0,
@@ -482,7 +556,9 @@ const SuggestionDropdown = ({
                         scale: isSelected ? 1.01 : 1,
                         backgroundColor:
                           selectedSuggestionId === suggestion.id
-                            ? "#f3f4f6"
+                            ? isDarkMode
+                              ? "#2d3748"
+                              : "#f3f4f6"
                             : undefined,
                       }}
                       transition={{
@@ -503,9 +579,15 @@ const SuggestionDropdown = ({
                 return (
                   <motion.li
                     key={suggestion.id || index}
-                    className={`p-2 hover:bg-gray-100 cursor-pointer rounded-md suggestion-item ${
-                      isSelected ? "font-medium !bg-zinc-100" : ""
-                    }`}
+                    className={`p-2 cursor-pointer rounded-md suggestion-item ${
+                      isDarkMode
+                        ? `hover:bg-zinc-700 ${
+                            isSelected ? "font-medium !bg-zinc-700" : ""
+                          }`
+                        : `hover:bg-gray-100 ${
+                            isSelected ? "font-medium !bg-zinc-100" : ""
+                          }`
+                    } ${isDarkMode ? "text-zinc-200" : "text-zinc-800"}`}
                     role="option"
                     id={`suggestion-${suggestion.id}`}
                     aria-selected={isSelected}
@@ -520,7 +602,9 @@ const SuggestionDropdown = ({
                       scale: selectedSuggestionId === suggestion.id ? 1.01 : 1,
                       backgroundColor:
                         selectedSuggestionId === suggestion.id
-                          ? "#f3f4f6"
+                          ? isDarkMode
+                            ? "#2d3748"
+                            : "#f3f4f6"
                           : undefined,
                     }}
                     transition={{
@@ -546,6 +630,8 @@ const SuggestionDropdown = ({
                                     ? `${
                                         highlightMatchesStyles
                                           ? highlightMatchesStyles
+                                          : isDarkMode
+                                          ? "bg-yellow-700"
                                           : "bg-yellow-200"
                                       }`
                                     : ""
@@ -564,7 +650,11 @@ const SuggestionDropdown = ({
               })}
               {hasMoreResults && (
                 <motion.div
-                  className="text-xs text-gray-500 p-2 text-center border-t border-gray-100 mt-1"
+                  className={`text-xs p-2 text-center border-t mt-1 ${
+                    isDarkMode
+                      ? "text-zinc-400 border-zinc-700"
+                      : "text-gray-500 border-gray-100"
+                  }`}
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                 >
@@ -575,7 +665,9 @@ const SuggestionDropdown = ({
           ) : (
             <>
               <motion.div
-                className="p-2 text-gray-500 text-center"
+                className={`p-2 text-center ${
+                  isDarkMode ? "text-zinc-400" : "text-gray-500"
+                }`}
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
               >
@@ -583,7 +675,9 @@ const SuggestionDropdown = ({
               </motion.div>
 
               <motion.div
-                className="p-2 text-gray-500 text-center"
+                className={`p-2 text-center ${
+                  isDarkMode ? "text-zinc-400" : "text-gray-500"
+                }`}
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
               >

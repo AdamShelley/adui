@@ -1,17 +1,25 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react-swc";
 import { resolve } from "path";
+import tailwindcss from "@tailwindcss/vite";
+import dts from "vite-plugin-dts";
 
 // https://vitejs.dev/config/
 export default defineConfig(() => {
   const isLibraryBuild = process.env.LIB_BUILD === "true";
 
   if (isLibraryBuild) {
-    // Library build configuration
     return {
       plugins: [
-        react(),
-        // Disabling automatic declaration generation since we're using a custom declaration file
+        react(), 
+        tailwindcss(),
+        dts({
+          include: ['src/index.ts', 'src/SearchBar.tsx', 'src/types/**/*.ts'],
+          exclude: ['**/*.test.ts', '**/*.test.tsx', '**/*.stories.tsx', 'src/main.tsx', 'src/App.tsx'],
+          insertTypesEntry: true,
+          rollupTypes: true,
+          copyDtsFiles: true
+        })
       ],
       build: {
         lib: {
@@ -20,7 +28,6 @@ export default defineConfig(() => {
           fileName: (format) => `index.${format}.js`,
         },
         rollupOptions: {
-          // Make sure all these packages are treated as external
           external: [
             "react",
             "react-dom",
@@ -30,7 +37,6 @@ export default defineConfig(() => {
             "motion/react-client",
           ],
           output: {
-            // Provide globals for UMD build
             globals: {
               react: "React",
               "react-dom": "ReactDOM",
@@ -39,13 +45,16 @@ export default defineConfig(() => {
               "motion/react": "motionReact",
               "motion/react-client": "motionReactClient",
             },
-            // Make sure to preserve modules for better tree-shaking
             preserveModules: false,
+            exports: "named", // Add this line to fix the warning
+            assetFileNames: (assetInfo) => {
+              if (assetInfo.name === "style.css") return "searchbar.css";
+              return assetInfo.name || "assets/[name]-[hash][extname]";
+            },
           },
         },
         sourcemap: true,
-        cssCodeSplit: false, // Keep CSS in one file
-        // Ensure that component doesn't include its own React copy
+        cssCodeSplit: true,
         commonjsOptions: {
           include: [],
           extensions: [".js", ".jsx", ".ts", ".tsx"],
@@ -55,8 +64,7 @@ export default defineConfig(() => {
     };
   }
 
-  // Default development/app build configuration
   return {
-    plugins: [react()],
+    plugins: [react(), tailwindcss()],
   };
 });

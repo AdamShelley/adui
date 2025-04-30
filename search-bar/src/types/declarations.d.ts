@@ -1,14 +1,55 @@
-declare module "*.css" {
-  const content: { [className: string]: string };
-  export default content;
-}
+declare module "@adamui/searchbar" {
+  import { FC } from "react";
 
-declare module "*.png" {
-  const value: string;
-  export default value;
-}
+  export interface Option {
+    id: number;
+    label: string;
+  }
 
-declare module "*.svg" {
-  const value: string;
-  export default value;
+  export interface SearchBarProps {
+    dropdownOptions?: Option[];
+    maxSuggestions?: number;
+    placeholder?: string;
+    onSelect?: (selectedOption: Option) => void;
+    onChange?: (inputValue: string) => void;
+    disabled?: boolean;
+    minimizable?: boolean;
+    showClearButton?: boolean;
+    clearButtonStyleClass?: string;
+    clearOnSelect?: boolean;
+    noResultsMessage?: string;
+    filterDebounceTime?: number;
+    renderItem?: (item: Option, isSelected: boolean) => React.ReactNode;
+    highlightMatches?: boolean;
+    highlightMatchesStyles?: string;
+    customLoader?: React.ReactNode;
+    width?: string;
+    height?: string;
+    darkMode?: boolean;
+  }
+
+  export interface SuggestionDropdownProps {
+    suggestions: Option[];
+    onSuggestionClick: (suggestion: Option) => void;
+    hasMoreResults?: boolean;
+    totalResults?: number;
+    selectedIndex?: number;
+    searchValue?: string;
+    selectedSuggestionId?: number | null;
+    noResultsMessage?: string;
+    renderItem?: (item: Option, isSelected: boolean) => React.ReactNode;
+    highlightMatches?: boolean;
+    highlightMatchesStyles?: string;
+    customLoader?: React.ReactNode;
+  }
+
+  // Named export for the SearchBar component
+  export const SearchBar: FC<SearchBarProps>;
+
+  // Default export for the SearchBar component
+  const DefaultSearchBar: FC<SearchBarProps>;
+  export default DefaultSearchBar;
+
+  // Utility export
+  export function cn(...inputs: (string | undefined | null | false)[]): string;
 }
