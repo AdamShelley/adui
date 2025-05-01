@@ -1,6 +1,6 @@
 import "./App.css";
 import { SearchBar } from "./SearchBar";
-import { useState } from "react";
+import React, { useState } from "react";
 
 const testSuggestions = [
   { id: 1, label: "Suggestion 1" },
@@ -60,6 +60,7 @@ function App() {
   return (
     <div className={`min-h-screen ${darkMode ? "bg-zinc-900" : "bg-gray-100"}`}>
       <main className="mx-auto py-8 px-4">
+        <p className="text-red-500">Test</p>
         <div className="flex flex-col items-center gap-8">
           <h1
             className={`text-2xl font-bold text-center ${

@@ -1,14 +1,56 @@
+"use client";
+
 import * as React from "react";
-import { AnimatePresence } from "motion/react";
-import * as motion from "motion/react-client";
 import { useState, useRef, useEffect, useCallback } from "react";
-import "./SearchBar.css";
-import { cn } from "./utils/cn";
-import {
-  Option,
-  SearchBarProps,
-  SuggestionDropdownProps,
-} from "./types/SearchBarTypes";
+import { AnimatePresence, motion } from "motion/react";
+import { cn } from "../utils/cn";
+
+// -------------------- Types --------------------
+
+export interface Option {
+  id: number;
+  label: string;
+}
+
+export interface SearchBarProps {
+  dropdownOptions?: Option[];
+  maxSuggestions?: number;
+  placeholder?: string;
+  onSelect?: (selectedOption: Option) => void;
+  onChange?: (inputValue: string) => void;
+  disabled?: boolean;
+  minimizable?: boolean;
+  showClearButton?: boolean;
+  clearButtonStyleClass?: string;
+  clearOnSelect?: boolean;
+  noResultsMessage?: string;
+  filterDebounceTime?: number;
+  renderItem?: (item: Option, isSelected: boolean) => React.ReactNode;
+  highlightMatches?: boolean;
+  highlightMatchesStyles?: string;
+  customLoader?: React.ReactNode;
+  width?: string;
+  height?: string;
+  darkMode?: boolean;
+}
+
+export interface SuggestionDropdownProps {
+  suggestions: Option[];
+  onSuggestionClick: (suggestion: Option) => void;
+  hasMoreResults?: boolean;
+  totalResults?: number;
+  selectedIndex?: number;
+  searchValue?: string;
+  selectedSuggestionId?: number | null;
+  noResultsMessage?: string;
+  renderItem?: (item: Option, isSelected: boolean) => React.ReactNode;
+  highlightMatches?: boolean;
+  highlightMatchesStyles?: string;
+  customLoader?: React.ReactNode;
+  isDarkMode?: boolean;
+}
+
+// -------------------- Components --------------------
 
 export const SearchBar: React.FC<SearchBarProps> = ({
   dropdownOptions = [],
@@ -327,7 +369,6 @@ export const SearchBar: React.FC<SearchBarProps> = ({
             originX: minimizable ? 0 : 0.5,
           }}
         >
-          {/* Improved SVG icon alignment */}
           <div
             className={cn(
               "flex items-center justify-center",
@@ -465,7 +506,6 @@ export const SearchBar: React.FC<SearchBarProps> = ({
   );
 };
 
-// Update SuggestionDropdown props to include isDarkMode
 const SuggestionDropdown = ({
   suggestions,
   onSuggestionClick,
@@ -480,7 +520,7 @@ const SuggestionDropdown = ({
   highlightMatchesStyles,
   customLoader,
   isDarkMode = false,
-}: SuggestionDropdownProps & { isDarkMode?: boolean }) => {
+}: SuggestionDropdownProps) => {
   return (
     <AnimatePresence>
       <motion.div
@@ -579,7 +619,7 @@ const SuggestionDropdown = ({
                 return (
                   <motion.li
                     key={suggestion.id || index}
-                    className={`p-2 cursor-pointer rounded-md suggestion-item ${
+                    className={`p-2 cursor-pointer rounded-md text-left suggestion-item ${
                       isDarkMode
                         ? `hover:bg-zinc-700 ${
                             isSelected ? "font-medium !bg-zinc-700" : ""

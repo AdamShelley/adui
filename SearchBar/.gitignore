@@ -22,7 +22,3 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
-todo.md
-
-/src/App.tsx
-/src/App.css

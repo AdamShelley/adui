@@ -19,31 +19,18 @@ A customizable React search bar component with advanced features, animations, an
 
 ```bash
 # npm
-npm install @adamui/searchbar
-
-# yarn
-yarn add @adamui/searchbar
-
-# pnpm
-pnpm add @adamui/searchbar
-
-# bun
-bun add @adamui/searchbar
+This will be copy and paste from ...
 ```
 
 ### Peer Dependencies
 
 This package requires the following peer dependencies:
 
-- React 17+ or 18+ or 19+
-- Motion 12+
-- TailwindCSS 3+ or 4+ (optional, for styling)
+npm i motion clsx tailwind-merge
 
 ## Usage
 
 ```tsx
-import { SearchBar } from "@adamui/searchbar";
-
 // Basic usage
 const MyComponent = () => {
   const options = [
