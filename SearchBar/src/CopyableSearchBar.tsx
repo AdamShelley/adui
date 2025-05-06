@@ -524,7 +524,7 @@ const SuggestionDropdown = ({
   return (
     <AnimatePresence>
       <motion.div
-        className={`absolute w-full shadow-lg top-full left-0 right-0 rounded-b-xl border border-t-0 box-border overflow-hidden ${
+        className={`z-[999] absolute w-full shadow-lg top-full left-0 right-0 rounded-b-xl border border-t-0 box-border overflow-hidden ${
           isDarkMode
             ? "bg-zinc-800 border-zinc-600"
             : "bg-white border-zinc-500"
@@ -542,7 +542,7 @@ const SuggestionDropdown = ({
           scaleY: 0.8,
         }}
         animate={{
-          opacity: selectedSuggestionId ? [1, 0.8, 0] : 1, // Fade the entire box when selection made
+          opacity: selectedSuggestionId ? [1, 0.8, 0] : 1,
           height: "auto",
           scaleY: 1,
         }}
