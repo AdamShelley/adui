@@ -1,8 +1,25 @@
 import "./App.css";
 import { SearchBar } from "./CopyableSearchBar";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 function App() {
+  const [systemDarkMode, setSystemDarkMode] = useState(false);
+
+  // Add effect to detect system dark mode
+  useEffect(() => {
+    const darkModeMediaQuery = window.matchMedia(
+      "(prefers-color-scheme: dark)"
+    );
+    setSystemDarkMode(darkModeMediaQuery.matches);
+
+    const handleChange = (e: MediaQueryListEvent) => {
+      setSystemDarkMode(e.matches);
+    };
+
+    darkModeMediaQuery.addEventListener("change", handleChange);
+    return () => darkModeMediaQuery.removeEventListener("change", handleChange);
+  }, []);
+
   const suggestions = [
     { id: 1, label: "Suggestion 1" },
     { id: 2, label: "Suggestion 2" },
@@ -43,51 +60,86 @@ function App() {
   );
 
   return (
-    <main className="p-6 max-w-6xl mx-auto">
+    <main
+      className={`p-6 max-w-6xl mx-auto ${
+        systemDarkMode ? "bg-zinc-900 text-white" : "bg-gray-100"
+      }`}
+    >
       <h1 className="text-2xl font-bold mb-6 text-center">
         Search Bar Component Showcase
       </h1>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        {/* Basic Search Bar */}
-        <div className="bg-white p-6 rounded-lg shadow-md">
-          <h2 className="text-lg font-semibold mb-3">Basic Search Bar</h2>
-          <p className="text-sm text-gray-600 mb-4">
-            Default configuration with suggestions
+        {/* Basic Search Bar - System Theme */}
+        <div
+          className={
+            systemDarkMode
+              ? "bg-zinc-800 p-6 rounded-lg shadow-md"
+              : "bg-white p-6 rounded-lg shadow-md"
+          }
+        >
+          <h2 className="text-lg font-semibold mb-3">
+            Basic Search Bar (System Theme)
+          </h2>
+          <p
+            className={`text-sm ${
+              systemDarkMode ? "text-gray-400" : "text-gray-600"
+            } mb-4`}
+          >
+            Uses system theme preference (currently:{" "}
+            {systemDarkMode ? "Dark" : "Light"})
           </p>
-          <SearchBar dropdownOptions={suggestions} />
+          <SearchBar
+            dropdownOptions={suggestions}
+            // Using undefined makes it use system preference
+          />
         </div>
 
-        {/* Dark Mode Search Bar */}
+        {/* Dark Mode Search Bar - Always Dark */}
         <div className="bg-zinc-800 p-6 rounded-lg shadow-md">
           <h2 className="text-lg font-semibold mb-3 text-white">
             Dark Mode Search Bar
           </h2>
-          <p className="text-sm text-gray-400 mb-4">Dark mode enabled</p>
+          <p className="text-sm text-gray-400 mb-4">Always dark mode</p>
           <SearchBar dropdownOptions={suggestions} darkMode={true} />
         </div>
 
-        {/* Minimizable Search Bar */}
-        <div className="bg-white p-6 rounded-lg shadow-md">
+        {/* Minimizable Search Bar - System Theme */}
+        <div
+          className={
+            systemDarkMode
+              ? "bg-zinc-800 p-6 rounded-lg shadow-md"
+              : "bg-white p-6 rounded-lg shadow-md"
+          }
+        >
           <h2 className="text-lg font-semibold mb-3">Minimizable Search Bar</h2>
-          <p className="text-sm text-gray-600 mb-4">
+          <p
+            className={`text-sm ${
+              systemDarkMode ? "text-gray-400" : "text-gray-600"
+            } mb-4`}
+          >
             Click the search icon to expand/collapse
           </p>
-          <SearchBar dropdownOptions={suggestions} minimizable={true} />
+          <SearchBar
+            dropdownOptions={suggestions}
+            minimizable={true}
+            // Using undefined makes it use system preference
+          />
         </div>
 
-        {/* Search Bar with Clear Button */}
+        {/* Search Bar with Clear Button - Light Theme */}
         <div className="bg-white p-6 rounded-lg shadow-md">
           <h2 className="text-lg font-semibold mb-3">
-            Search Bar with Clear Button
+            Search Bar with Clear Button (Light)
           </h2>
           <p className="text-sm text-gray-600 mb-4">
-            Shows a button to clear input
+            Always light mode with clear button
           </p>
           <SearchBar
             dropdownOptions={suggestions}
             showClearButton={true}
             placeholder="Type to search..."
+            darkMode={false}
           />
         </div>
 
