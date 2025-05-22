@@ -1,5 +1,5 @@
 {
-  "name": "searchbar",
+   "name": "@adamui/searchbar",
   "private": true,
   "version": "0.0.0",
   "type": "module",
