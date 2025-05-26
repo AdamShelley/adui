@@ -4,6 +4,7 @@ import * as React from "react";
 import Link from "next/link";
 import { cn } from "@/utils/cn";
 import { Menu, X } from "lucide-react";
+import { ModeToggle } from "./theme-toggle";
 
 const navLinks = [
   { href: "/", label: "Home" },
@@ -18,15 +19,15 @@ export function NavBar({ className }: { className?: string }) {
   return (
     <nav
       className={cn(
-        "w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60",
+        "w-full border-b dark:bg-background/95 dark:backdrop-blur dark:supports-[backdrop-filter]:bg-background/60",
         className
       )}
     >
-      <div className="container flex h-16 items-center justify-between">
+      <div className="w-full flex h-16 items-center justify-between px-4">
         <Link href="/" className="font-bold text-lg">
           adamui
         </Link>
-        <div className="hidden md:flex gap-6">
+        <div className="hidden md:flex gap-6 align-center justify-center">
           {navLinks.map((link) => (
             <Link
               key={link.href}
@@ -36,13 +37,16 @@ export function NavBar({ className }: { className?: string }) {
               {link.label}
             </Link>
           ))}
+          <ModeToggle />
         </div>
+
         <div className="md:hidden">
           <button onClick={() => setOpen((o) => !o)} aria-label="Toggle menu">
             {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </button>
         </div>
       </div>
+
       {open && (
         <div className="md:hidden border-t bg-background">
           <div className="container flex flex-col gap-2 py-4">

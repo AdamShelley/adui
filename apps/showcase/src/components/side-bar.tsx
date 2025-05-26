@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 
-const components = ["search-bar", "test"];
+const components = ["search-bar"];
 
 const SideBar = () => {
   return (
@@ -17,6 +17,8 @@ const SideBar = () => {
           </li>
         ))}
       </ul>
+
+      <p className="text-gray-500">More will be added as I make them...</p>
     </div>
   );
 };
