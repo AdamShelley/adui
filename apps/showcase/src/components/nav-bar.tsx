@@ -17,17 +17,12 @@ export function NavBar({ className }: { className?: string }) {
   const [open, setOpen] = React.useState(false);
 
   return (
-    <nav
-      className={cn(
-        "w-full border-b dark:bg-background/95 dark:backdrop-blur dark:supports-[backdrop-filter]:bg-background/60",
-        className
-      )}
-    >
+    <nav className={cn("w-full border-b dark:border-b-zinc-600", className)}>
       <div className="w-full flex h-16 items-center justify-between px-4">
         <Link href="/" className="font-bold text-lg">
           adamui
         </Link>
-        <div className="hidden md:flex gap-6 align-center justify-center">
+        <div className="hidden md:flex gap-5 items-center justify-center">
           {navLinks.map((link) => (
             <Link
               key={link.href}
@@ -41,6 +36,7 @@ export function NavBar({ className }: { className?: string }) {
         </div>
 
         <div className="md:hidden">
+          t-me{" "}
           <button onClick={() => setOpen((o) => !o)} aria-label="Toggle menu">
             {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </button>

@@ -6,7 +6,7 @@ const components = ["search-bar"];
 
 const SideBar = () => {
   return (
-    <div className="w-[15rem] border-r h-full p-2">
+    <div className="w-[15rem] border-r dark:border-r-zinc-600 h-full p-2">
       <div>Components</div>
       <ul>
         <li>Install</li>
