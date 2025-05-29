@@ -19,6 +19,17 @@
   }
 } */
 
+:root {
+  /* Your default theme */
+  --background: white;
+  --foreground: black;
+}
+
+[data-theme="dark"] {
+  --background: black;
+  --foreground: white;
+}
+
 body {
   /* color: var(--foreground); */
   /* font-family: Arial, Helvetica, sans-serif; */

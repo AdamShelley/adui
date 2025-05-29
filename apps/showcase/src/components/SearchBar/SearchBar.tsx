@@ -32,6 +32,7 @@ export interface SearchBarProps {
   width?: string;
   height?: string;
   darkMode?: boolean;
+  noOpenAnimation?: boolean;
 }
 
 export interface SuggestionDropdownProps {
@@ -72,6 +73,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({
   width = "400px",
   height = "48px",
   darkMode,
+  noOpenAnimation,
 }) => {
   const [isFocused, setIsFocused] = useState(false);
   const inputRef = useRef(null);
@@ -325,6 +327,8 @@ export const SearchBar: React.FC<SearchBarProps> = ({
               ? isMinimized
                 ? "60px"
                 : width
+              : noOpenAnimation
+              ? width
               : isFocused
               ? `calc(${width} + 12px)`
               : width,

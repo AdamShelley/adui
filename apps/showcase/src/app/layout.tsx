@@ -17,7 +17,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "@AdamUI",
+  title: "@A/UI",
   description: "A showcase of AdamUI components",
 };
 
@@ -39,9 +39,9 @@ export default function RootLayout({
         >
           <NoiseBackground className="min-h-screen ">
             <NavBar />
-            <div className="w-screen h-screen flex">
+            <div className="w-screen h-screen flex ">
               <SideBar />
-              <div className="flex-1 mb-20">{children}</div>
+              <div className="flex-1 mb-20 ">{children}</div>
             </div>
           </NoiseBackground>
         </ThemeProvider>
