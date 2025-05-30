@@ -5,14 +5,24 @@ import Link from "next/link";
 import { cn } from "@/utils/cn";
 import { Menu, X } from "lucide-react";
 import { ModeToggle } from "./theme-toggle";
-import { SearchBar } from "./SearchBar/SearchBar";
+import { Option, SearchBar } from "./SearchBar/SearchBar";
 import { useTheme } from "next-themes";
+import { useRouter } from "next/navigation";
 
 const navLinks = [{ href: "/components", label: "Components" }];
 
 export function NavBar({ className }: { className?: string }) {
   const [open, setOpen] = React.useState(false);
   const { theme } = useTheme();
+  const router = useRouter();
+
+  const componentOptions = [
+    { id: 1, href: "/ui/SearchBar", label: "Search Bar" },
+  ];
+
+  const searchBarClick = (option: Option) => {
+    router.push(option.href as string);
+  };
 
   return (
     <nav
@@ -21,23 +31,32 @@ export function NavBar({ className }: { className?: string }) {
         className
       )}
     >
-      <div className="w-full flex h-16 items-center justify-between px-4">
-        <Link href="/" className="font-bold text-lg">
-          A/UI
-        </Link>
-        <div className="hidden md:flex gap-4 items-center justify-center">
-          {navLinks.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              className="text-sm font-medium transition-colors hover:text-primary"
-            >
-              {link.label}
-            </Link>
-          ))}
-
+      <div className="w-full flex h-20 items-center justify-between px-4">
+        <div className="flex items-center justify-center">
+          <Link href="/" className="font-bold text-lg">
+            A/UI
+          </Link>
+          <div className="hidden md:flex gap-4 items-center justify-center">
+            {navLinks.map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                className="text-sm font-medium transition-colors hover:text-primary ml-5"
+              >
+                {link.label}
+              </Link>
+            ))}
+          </div>
+        </div>
+        <div className="flex items-center gap-4">
           <ModeToggle />
-          <SearchBar darkMode={theme === "dark"} noOpenAnimation />
+          <SearchBar
+            dropdownOptions={componentOptions}
+            onSelect={searchBarClick}
+            darkMode={theme === "dark"}
+            noOpenAnimation
+            width="15rem"
+          />
         </div>
 
         <div className="md:hidden">

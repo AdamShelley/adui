@@ -16,7 +16,7 @@ export function ModeToggle() {
   if (!mounted) {
     return (
       <button
-        className="relative z-10 border border-slate-400 bg-slate-300 flex items-center justify-center self-center w-10 h-10 ml-8 rounded-full"
+        className="relative z-10 border border-slate-200 bg-slate-300 flex items-center justify-center self-center w-10 h-10 ml-8 rounded-full"
         aria-label="Loading theme toggle"
       />
     );
@@ -25,7 +25,7 @@ export function ModeToggle() {
   return (
     <button
       onClick={() => setTheme(theme === "light" ? "dark" : "light")}
-      className="relative z-10 border border-slate-400 bg-slate-500 text-slate-950 dark:bg-slate-700 dark:border-slate-600 dark:text-slate-100 flex items-center justify-center self-center w-10 h-10 ml-1 flex-shrink-0 transition-colors duration-300 ease-in-out rounded-full hover:opacity-90 active:scale-95 cursor-pointer"
+      className="relative z-10 border border-slate-400 bg-slate-500 text-slate-950 dark:bg-slate-900 dark:border-slate-600 dark:text-slate-200 flex items-center justify-center self-center w-10 h-10 ml-1 flex-shrink-0 transition-colors duration-300 ease-in-out rounded-full hover:opacity-90 active:scale-95 cursor-pointer"
       aria-label="Toggle theme"
     >
       {theme === "light" ? (

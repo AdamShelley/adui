@@ -10,6 +10,8 @@ import { cn } from "@/utils/cn";
 export interface Option {
   id: number;
   label: string;
+  // this is to allow any additional properties on the option
+  [key: string]: unknown;
 }
 
 export interface SearchBarProps {

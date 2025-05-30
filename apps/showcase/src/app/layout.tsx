@@ -17,7 +17,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "@A/UI",
+  title: "A/UI",
   description: "A showcase of AdamUI components",
 };
 
