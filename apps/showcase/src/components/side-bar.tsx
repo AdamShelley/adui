@@ -13,7 +13,7 @@ const SideBar = () => {
         {components.map((post) => (
           <li
             key={post}
-            className=" hover:text-gray-400 transition-colors py-1"
+            className="text-gray-300 hover:text-gray-400 transition-colors py-1"
           >
             <Link href={`/ui/${encodeURIComponent(post)}`}>{post}</Link>
           </li>
