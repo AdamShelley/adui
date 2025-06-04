@@ -39,7 +39,7 @@ export default function RootLayout({
         >
           <NoiseBackground className="min-h-screen ">
             <NavBar />
-            <div className="w-screen h-screen flex ">
+            <div className="w-full h-screen flex ">
               <SideBar />
               <div className="flex-1 mb-20 ">{children}</div>
             </div>
