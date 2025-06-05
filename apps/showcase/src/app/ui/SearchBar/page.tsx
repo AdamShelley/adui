@@ -1,7 +1,10 @@
 "use client";
 
+import { CodeCopier } from "@/components/code-copier";
 import { SearchBar } from "@/components/SearchBar/SearchBar";
 import { useTheme } from "next-themes";
+
+import { searchBarSnippets } from "@/components/snippets/searchbar-snippet";
 
 export default function SearchBarShowcase() {
   const suggestions = [
@@ -13,7 +16,6 @@ export default function SearchBarShowcase() {
   ];
 
   const { theme } = useTheme();
-
   return (
     <div className="p-5">
       <h1 className="text-2xl font-bold mb-4">Search Bar</h1>
@@ -22,12 +24,9 @@ export default function SearchBarShowcase() {
       <SearchBar dropdownOptions={suggestions} darkMode={theme === "dark"} />
       <div>
         <h4 className="font-medium text-muted-foreground">Installation</h4>
-        <h5>Install dependencies</h5>
-        <pre className="bg-gray-100 dark:bg-gray-800 p-4 rounded">
-          <code className="text-sm">bun add motion clsx tailwind-merge</code>
-        </pre>
-        <h5>Add tailwind merge util</h5>
-        <h5>Copy source code into your project</h5>
+        {searchBarSnippets.map((snippet) => (
+          <CodeCopier snippet={snippet} key={snippet.title} />
+        ))}
       </div>
 
       <h4 className="font-medium text-muted-foreground">Props</h4>
