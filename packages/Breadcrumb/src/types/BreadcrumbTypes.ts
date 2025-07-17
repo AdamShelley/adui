@@ -7,7 +7,7 @@ export interface BreadcrumbItem {
 
 export interface BreadcrumbProps {
   items: BreadcrumbItem[];
-  separator?: "chevron" | "slash" | "arrow" | "custom";
+  separator?: "chevron" | "slash" | "line" | "custom";
   customSeparator?: React.ReactNode;
   showHome?: boolean;
   homeHref?: string;
