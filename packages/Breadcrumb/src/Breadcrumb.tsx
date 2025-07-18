@@ -42,43 +42,22 @@ export const Breadcrumb: React.FC<BreadcrumbProps> = ({
                 key={index}
                 className="flex items-center justify-center gap-2"
               >
+                {/* LOGO */}
                 {item.icon ? (
                   <span className="text-slate-400">{item.icon}</span>
                 ) : null}
-                <span>{item.label}</span>
+
+                {/* LINK */}
+                {item.href ? (
+                  <a href={item.href}>{item.label}</a>
+                ) : (
+                  <span>{item.label}</span>
+                )}
               </div>
             </>
           );
         })}
       </div>
-
-      {/* <div>
-        <ul>
-          {items.map((item, index) => (
-            <li
-              key={index}
-              className={`breadcrumb-item ${item.isActive ? "active" : ""}`}
-              onClick={() => onItemClick && onItemClick(item, index)}
-            >
-              {item.icon && (
-                <span className="breadcrumb-icon">{item.icon}</span>
-              )}
-              {item.href ? (
-                <a href={item.href} className="breadcrumb-link">
-                  {item.label}
-                </a>
-              ) : (
-                <span className="breadcrumb-label">{item.label}</span>
-              )}
-              {index < items.length - 1 && (
-                <span className={`breadcrumb-separator ${separator}`}>
-                  {customSeparator || ">"}
-                </span>
-              )}
-            </li>
-          ))}
-        </ul>
-      </div> */}
     </nav>
   );
 };
