@@ -1,4 +1,4 @@
-import { Home } from "lucide-react";
+import { AppleIcon, BellElectricIcon, Home, Laptop, Store } from "lucide-react";
 import "./App.css";
 import { Breadcrumb } from "./Breadcrumb";
 import { BreadcrumbItem } from "./types/BreadcrumbTypes";
@@ -7,10 +7,18 @@ function App() {
   // Sample breadcrumb data for testing
   const sampleItems: BreadcrumbItem[] = [
     { label: "Home", href: "/", icon: <Home /> },
-    { label: "Products", href: "/products" },
-    { label: "Electronics", href: "/products/electronics" },
-    { label: "Laptops", href: "/products/electronics/laptops" },
-    { label: "MacBook Pro" },
+    { label: "Products", href: "/products", icon: <Store /> },
+    {
+      label: "Electronics",
+      href: "/products/electronics",
+      icon: <BellElectricIcon />,
+    },
+    {
+      label: "Laptops",
+      href: "/products/electronics/laptops",
+      icon: <Laptop />,
+    },
+    { label: "MacBook Pro", icon: <AppleIcon /> },
   ];
 
   const handleBreadcrumbClick = (item: BreadcrumbItem, index: number) => {

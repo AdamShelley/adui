@@ -1,7 +1,8 @@
 import React from "react";
 import { BreadcrumbProps } from "./types/BreadcrumbTypes";
-import "./Breadcrumb.css";
 import { ChevronRight } from "lucide-react";
+
+import { motion } from "motion/react";
 
 const LineSeparator = () => (
   <div className="flex items-center justify-center">
@@ -22,12 +23,39 @@ export const Breadcrumb: React.FC<BreadcrumbProps> = ({
   maxItems,
   collapseFrom = "middle",
 }) => {
+  const initialTransition =
+    collapseFrom === "start"
+      ? { transform: "translateX(-100px)" }
+      : { transform: "translateX(100px)" };
+
+  const parentVariants = {
+    animate: {
+      transition: {
+        staggerChildren: 0.05,
+      },
+    },
+  };
+
+  const childVariants = {
+    initial: { opacity: 0, x: 20 },
+    animate: { opacity: 1, x: 0 },
+  };
+
   return (
     <nav className={`breadcrumb ${className}`} aria-label="breadcrumb">
-      <div className="flex gap-1">
+      <motion.div
+        className="flex gap-1"
+        initial="initial"
+        animate="animate"
+        variants={parentVariants}
+      >
         {items.map((item, index) => {
           return (
-            <>
+            <motion.div
+              key={index}
+              className="flex items-center gap-2"
+              variants={childVariants}
+            >
               <div>
                 {index !== 0 && (
                   <div className="flex items-center justify-center h-full">
@@ -38,7 +66,7 @@ export const Breadcrumb: React.FC<BreadcrumbProps> = ({
                   </div>
                 )}
               </div>
-              <div
+              <motion.div
                 key={index}
                 className="flex items-center justify-center gap-2"
               >
@@ -53,11 +81,11 @@ export const Breadcrumb: React.FC<BreadcrumbProps> = ({
                 ) : (
                   <span>{item.label}</span>
                 )}
-              </div>
-            </>
+              </motion.div>
+            </motion.div>
           );
         })}
-      </div>
+      </motion.div>
     </nav>
   );
 };
