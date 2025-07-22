@@ -1,5 +1,5 @@
-import React from "react";
-import { BreadcrumbProps } from "./types/BreadcrumbTypes";
+import React, { useEffect } from "react";
+import { BreadcrumbItem, BreadcrumbProps } from "./types/BreadcrumbTypes";
 import { ChevronRight } from "lucide-react";
 
 import { motion } from "motion/react";
@@ -20,13 +20,10 @@ export const Breadcrumb: React.FC<BreadcrumbProps> = ({
   size = "md",
   className = "",
   onItemClick,
-  maxItems,
+  maxItems = 5,
   collapseFrom = "middle",
 }) => {
-  const initialTransition =
-    collapseFrom === "start"
-      ? { transform: "translateX(-100px)" }
-      : { transform: "translateX(100px)" };
+  const [visibleItems, setVisibleItems] = React.useState<BreadcrumbItem[]>([]);
 
   const parentVariants = {
     animate: {
@@ -41,6 +38,18 @@ export const Breadcrumb: React.FC<BreadcrumbProps> = ({
     animate: { opacity: 1, x: 0 },
   };
 
+  useEffect(() => {
+    const getVisibleItems = () => {
+      if (items.length <= maxItems) {
+        setVisibleItems(items);
+      }
+
+      // Handle when items exceed
+    };
+
+    getVisibleItems();
+  }, [items, maxItems]);
+
   return (
     <nav className={`breadcrumb ${className}`} aria-label="breadcrumb">
       <motion.div
@@ -50,6 +59,11 @@ export const Breadcrumb: React.FC<BreadcrumbProps> = ({
         variants={parentVariants}
       >
         {items.map((item, index) => {
+          // If showhome is false
+          if (index === 0 && !showHome) {
+            return null;
+          }
+
           return (
             <motion.div
               key={index}
@@ -77,7 +91,16 @@ export const Breadcrumb: React.FC<BreadcrumbProps> = ({
 
                 {/* LINK */}
                 {item.href ? (
-                  <a href={item.href}>{item.label}</a>
+                  <motion.a
+                    className="hover:text-blue-800  transition-colors duration-200"
+                    href={item.href}
+                    whileHover={{
+                      scale: 1.05,
+                      transition: { duration: 0.1 },
+                    }}
+                  >
+                    {item.label}
+                  </motion.a>
                 ) : (
                   <span>{item.label}</span>
                 )}

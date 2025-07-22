@@ -1,4 +1,4 @@
-import { AppleIcon, BellElectricIcon, Home, Laptop, Store } from "lucide-react";
+import { AppleIcon, Home, Laptop, Store } from "lucide-react";
 import "./App.css";
 import { Breadcrumb } from "./Breadcrumb";
 import { BreadcrumbItem } from "./types/BreadcrumbTypes";
@@ -11,7 +11,6 @@ function App() {
     {
       label: "Electronics",
       href: "/products/electronics",
-      icon: <BellElectricIcon />,
     },
     {
       label: "Laptops",
@@ -33,11 +32,12 @@ function App() {
 
       <main className="app-main">
         <section className="demo-section">
-          <h2>Your Breadcrumb Component</h2>
+          <h2>Beautiful Breadcrumbs</h2>
           <div className="demo-container">
             <Breadcrumb
               items={sampleItems}
               onItemClick={handleBreadcrumbClick}
+              showHome={false}
             />
           </div>
         </section>
