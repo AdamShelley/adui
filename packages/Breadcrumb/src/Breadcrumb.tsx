@@ -1,4 +1,6 @@
-import React, { useEffect } from "react";
+"use client";
+
+import React, { useEffect, useState, useCallback } from "react";
 import { BreadcrumbItem, BreadcrumbProps } from "./types/BreadcrumbTypes";
 import { ChevronRight } from "lucide-react";
 
@@ -11,6 +13,7 @@ const LineSeparator = () => (
 );
 
 export const Breadcrumb: React.FC<BreadcrumbProps> = ({
+  mode = "url-based",
   items,
   separator = "chevron",
   customSeparator,
@@ -24,6 +27,7 @@ export const Breadcrumb: React.FC<BreadcrumbProps> = ({
   collapseFrom = "middle",
 }) => {
   const [visibleItems, setVisibleItems] = React.useState<BreadcrumbItem[]>([]);
+  const [currentPath, setCurrentPath] = useState("");
 
   const parentVariants = {
     animate: {
@@ -38,27 +42,45 @@ export const Breadcrumb: React.FC<BreadcrumbProps> = ({
     animate: { opacity: 1, x: 0 },
   };
 
-  useEffect(() => {
-    const getVisibleItems = () => {
-      if (items.length <= maxItems) {
-        setVisibleItems(items);
+  const generateCrumbsFromUrl = useCallback(() => {
+    if (mode === "url-based") {
+      const pathParts = currentPath.split("/").filter(Boolean);
+      const newItems: BreadcrumbItem[] = pathParts.map((part, index) => {
+        const href = `/${pathParts.slice(0, index + 1).join("/")}`;
+        return {
+          label: part.charAt(0).toUpperCase() + part.slice(1),
+          href,
+          icon: null,
+        };
+      });
+      if (showHome) {
+        newItems.unshift({ label: "Home", href: homeHref, icon: null });
       }
+      setVisibleItems(newItems);
+    } else {
+      setVisibleItems(items);
+    }
+  }, [mode, items, currentPath, homeHref, showHome]);
 
-      // Handle when items exceed
-    };
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      setCurrentPath(window.location.pathname);
+    }
 
-    getVisibleItems();
-  }, [items, maxItems]);
+    if (mode === "url-based") {
+      generateCrumbsFromUrl();
+    }
+  }, [mode, generateCrumbsFromUrl]);
 
   return (
-    <nav className={`breadcrumb ${className}`} aria-label="breadcrumb">
+    <nav className={`${className}`} aria-label="breadcrumb">
       <motion.div
         className="flex gap-1"
         initial="initial"
         animate="animate"
         variants={parentVariants}
       >
-        {items.map((item, index) => {
+        {visibleItems.map((item, index) => {
           // If showhome is false
           if (index === 0 && !showHome) {
             return null;
@@ -67,7 +89,7 @@ export const Breadcrumb: React.FC<BreadcrumbProps> = ({
           return (
             <motion.div
               key={index}
-              className="flex items-center gap-2"
+              className="flex items-center gap-1"
               variants={childVariants}
             >
               <div>
@@ -82,7 +104,7 @@ export const Breadcrumb: React.FC<BreadcrumbProps> = ({
               </div>
               <motion.div
                 key={index}
-                className="flex items-center justify-center gap-2"
+                className="flex items-center justify-center gap-1"
               >
                 {/* LOGO */}
                 {item.icon ? (
@@ -92,7 +114,7 @@ export const Breadcrumb: React.FC<BreadcrumbProps> = ({
                 {/* LINK */}
                 {item.href ? (
                   <motion.a
-                    className="hover:text-blue-800  transition-colors duration-200"
+                    className="hover:text-blue-800  transition-colors duration-200 overflow-auto whitespace-nowrap"
                     href={item.href}
                     whileHover={{
                       scale: 1.05,
@@ -102,7 +124,9 @@ export const Breadcrumb: React.FC<BreadcrumbProps> = ({
                     {item.label}
                   </motion.a>
                 ) : (
-                  <span>{item.label}</span>
+                  <span className="overflow-auto whitespace-nowrap">
+                    {item.label}
+                  </span>
                 )}
               </motion.div>
             </motion.div>
