@@ -8,7 +8,7 @@ import { motion } from "motion/react";
 
 const LineSeparator = () => (
   <div className="flex items-center justify-center">
-    <div className="h-1 w-10 bg-slate-400 rounded-sm "></div>
+    <div className="h-1 w-4 bg-gray-800 rounded-xs "></div>
   </div>
 );
 
@@ -27,6 +27,8 @@ export const Breadcrumb: React.FC<BreadcrumbProps> = ({
   collapseFrom = "middle",
 }) => {
   const [visibleItems, setVisibleItems] = React.useState<BreadcrumbItem[]>([]);
+  const [hiddenItems, setHiddenItems] = React.useState<BreadcrumbItem[]>([]);
+  const [showHiddenDropdown, setShowHiddenDropdown] = useState<boolean>(false);
   const [currentPath, setCurrentPath] = useState("");
 
   const parentVariants = {
@@ -56,11 +58,24 @@ export const Breadcrumb: React.FC<BreadcrumbProps> = ({
       if (showHome) {
         newItems.unshift({ label: "Home", href: homeHref, icon: null });
       }
-      setVisibleItems(newItems);
+
+      // Limit the number of items based on maxItems
+      if (newItems.length > maxItems) {
+        // New items to be spliced by showing the last `maxItems` items
+        const startIndex = newItems.length - maxItems;
+        const newItemsToShow = newItems.slice(startIndex);
+        setVisibleItems(newItemsToShow);
+        // Save the previous items as hidden Items
+        setHiddenItems(newItems.slice(0, startIndex));
+      } else {
+        setVisibleItems(newItems);
+      }
     } else {
       setVisibleItems(items);
     }
-  }, [mode, items, currentPath, homeHref, showHome]);
+  }, [mode, currentPath, showHome, maxItems, homeHref, items]);
+
+  const showDropdown = () => {};
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -75,11 +90,49 @@ export const Breadcrumb: React.FC<BreadcrumbProps> = ({
   return (
     <nav className={`${className}`} aria-label="breadcrumb">
       <motion.div
-        className="flex gap-1"
+        className="flex gap-1 relative"
         initial="initial"
         animate="animate"
         variants={parentVariants}
       >
+        {hiddenItems.length > 0 && (
+          <motion.div
+            className="flex items-center gap-1"
+            variants={childVariants}
+          >
+            <span
+              className="text-gray-400 font-bold cursor-pointer hover:text-blue-800 transition-colors duration-200"
+              onClick={() => setShowHiddenDropdown(!showHiddenDropdown)}
+            >
+              ...
+            </span>
+
+            {showHiddenDropdown ? (
+              <div className=" absolute top-6 border border-gray-100 bg-white shadow-xs rounded-lg px-4 py-2 z-10 ">
+                {hiddenItems.map((item, index) => (
+                  <div className="flex flex-col align-center justify-start gap-2 w-full h-full font-medium text-base">
+                    {item.href ? (
+                      <motion.a
+                        className="hover:text-blue-800  transition-colors duration-200 overflow-auto whitespace-nowrap"
+                        href={item.href}
+                        whileHover={{
+                          scale: 1.05,
+                          transition: { duration: 0.1 },
+                        }}
+                      >
+                        {item.label}
+                      </motion.a>
+                    ) : (
+                      <span className="overflow-auto whitespace-nowrap">
+                        {item.label}
+                      </span>
+                    )}
+                  </div>
+                ))}
+              </div>
+            ) : null}
+          </motion.div>
+        )}
         {visibleItems.map((item, index) => {
           // If showhome is false
           if (index === 0 && !showHome) {
@@ -94,7 +147,7 @@ export const Breadcrumb: React.FC<BreadcrumbProps> = ({
             >
               <div>
                 {index !== 0 && (
-                  <div className="flex items-center justify-center h-full">
+                  <div className="flex items-center justify-center h-full text-gray-400 size-4">
                     {separator === "chevron" && <ChevronRight />}
                     {separator === "slash" && <span>/</span>}
                     {separator === "line" && <LineSeparator />}
