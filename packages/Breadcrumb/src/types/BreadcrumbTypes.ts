@@ -15,7 +15,6 @@ export interface BreadcrumbProps {
   variant?: "default" | "pills" | "minimal" | "bordered";
   size?: "sm" | "md" | "lg";
   className?: string;
-  onItemClick?: (item: BreadcrumbItem, index: number) => void;
   maxItems?: number;
-  collapseFrom?: "start" | "middle";
+  onItemClick?: (item: BreadcrumbItem, index: number) => void;
 }

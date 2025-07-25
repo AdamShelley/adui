@@ -19,12 +19,9 @@ export const Breadcrumb: React.FC<BreadcrumbProps> = ({
   customSeparator,
   showHome = true,
   homeHref = "/",
-  variant = "default",
-  size = "md",
   className = "",
-  onItemClick,
   maxItems = 5,
-  collapseFrom = "middle",
+  onItemClick,
 }) => {
   const [visibleItems, setVisibleItems] = React.useState<BreadcrumbItem[]>([]);
   const [hiddenItems, setHiddenItems] = React.useState<BreadcrumbItem[]>([]);
@@ -61,11 +58,9 @@ export const Breadcrumb: React.FC<BreadcrumbProps> = ({
 
       // Limit the number of items based on maxItems
       if (newItems.length > maxItems) {
-        // New items to be spliced by showing the last `maxItems` items
         const startIndex = newItems.length - maxItems;
         const newItemsToShow = newItems.slice(startIndex);
         setVisibleItems(newItemsToShow);
-        // Save the previous items as hidden Items
         setHiddenItems(newItems.slice(0, startIndex));
       } else {
         setVisibleItems(newItems);
@@ -108,25 +103,47 @@ export const Breadcrumb: React.FC<BreadcrumbProps> = ({
             </span>
 
             {showHiddenDropdown ? (
-              <div className=" absolute top-6 border border-gray-100 bg-white shadow-xs rounded-lg px-4 py-2 z-10 ">
+              <div className=" absolute top-6 left-0 bg-white rounded-sm z-10 mt-1">
                 {hiddenItems.map((item, index) => (
-                  <div className="flex flex-col align-center justify-start gap-2 w-full h-full font-medium text-base">
-                    {item.href ? (
-                      <motion.a
-                        className="hover:text-blue-800  transition-colors duration-200 overflow-auto whitespace-nowrap"
-                        href={item.href}
-                        whileHover={{
-                          scale: 1.05,
-                          transition: { duration: 0.1 },
-                        }}
-                      >
-                        {item.label}
-                      </motion.a>
-                    ) : (
-                      <span className="overflow-auto whitespace-nowrap">
-                        {item.label}
-                      </span>
-                    )}
+                  <div className="flex flex-row items-center" key={index}>
+                    <div>
+                      <div className="flex items-center justify-center h-full text-gray-400 size-4">
+                        {separator === "chevron" && <ChevronRight />}
+                        {separator === "slash" && <span>/</span>}
+                        {separator === "line" && <LineSeparator />}
+                        {separator === "custom" && customSeparator}
+                      </div>
+                    </div>
+                    <div className="flex flex-col align-center justify-start gap-2 w-full h-full text-base">
+                      {item.href ? (
+                        <motion.a
+                          className="hover:text-blue-800 transition-colors duration-200 overflow-auto whitespace-nowrap"
+                          href={item.href}
+                          whileHover={{
+                            scale: 1.05,
+                            transition: { duration: 0.1 },
+                          }}
+                          onClick={() => {
+                            if (onItemClick) {
+                              onItemClick(item, index);
+                            }
+                          }}
+                        >
+                          {item.label}
+                        </motion.a>
+                      ) : (
+                        <span
+                          className="overflow-auto whitespace-nowrap"
+                          onClick={() => {
+                            if (onItemClick) {
+                              onItemClick(item, index);
+                            }
+                          }}
+                        >
+                          {item.label}
+                        </span>
+                      )}
+                    </div>
                   </div>
                 ))}
               </div>
@@ -173,11 +190,23 @@ export const Breadcrumb: React.FC<BreadcrumbProps> = ({
                       scale: 1.05,
                       transition: { duration: 0.1 },
                     }}
+                    onClick={() => {
+                      if (onItemClick) {
+                        onItemClick(item, index);
+                      }
+                    }}
                   >
                     {item.label}
                   </motion.a>
                 ) : (
-                  <span className="overflow-auto whitespace-nowrap">
+                  <span
+                    className="overflow-auto whitespace-nowrap"
+                    onClick={() => {
+                      if (onItemClick) {
+                        onItemClick(item, index);
+                      }
+                    }}
+                  >
                     {item.label}
                   </span>
                 )}
