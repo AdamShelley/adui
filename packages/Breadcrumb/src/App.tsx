@@ -35,6 +35,7 @@ function App() {
           items={sampleItems}
           onItemClick={handleBreadcrumbClick}
           showHome={true}
+          collapsible={true}
         />
       </main>
     </div>

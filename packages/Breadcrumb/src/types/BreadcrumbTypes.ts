@@ -17,4 +17,5 @@ export interface BreadcrumbProps {
   className?: string;
   maxItems?: number;
   onItemClick?: (item: BreadcrumbItem, index: number) => void;
+  collapsible?: boolean;
 }

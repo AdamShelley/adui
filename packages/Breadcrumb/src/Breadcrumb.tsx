@@ -22,11 +22,13 @@ export const Breadcrumb: React.FC<BreadcrumbProps> = ({
   className = "",
   maxItems = 5,
   onItemClick,
+  collapsible = false,
 }) => {
   const [visibleItems, setVisibleItems] = React.useState<BreadcrumbItem[]>([]);
   const [hiddenItems, setHiddenItems] = React.useState<BreadcrumbItem[]>([]);
   const [showHiddenDropdown, setShowHiddenDropdown] = useState<boolean>(false);
   const [currentPath, setCurrentPath] = useState("");
+  const [collapsed, setCollapsed] = useState<boolean>(collapsible);
 
   const parentVariants = {
     animate: {
@@ -40,6 +42,20 @@ export const Breadcrumb: React.FC<BreadcrumbProps> = ({
     initial: { opacity: 0, x: 20 },
     animate: { opacity: 1, x: 0 },
   };
+
+  const checkIfCurrentPath = useCallback(
+    (href: string) => {
+      const currentSegments = currentPath.split("/").filter(Boolean);
+      const hrefSegments = href.split("/").filter(Boolean);
+      const lastCurrentSegment = currentSegments[currentSegments.length - 1];
+      const lastHrefSegment = hrefSegments[hrefSegments.length - 1];
+
+      return (
+        lastCurrentSegment?.toLowerCase() === lastHrefSegment?.toLowerCase()
+      );
+    },
+    [currentPath]
+  );
 
   const generateCrumbsFromUrl = useCallback(() => {
     if (mode === "url-based") {
@@ -70,8 +86,6 @@ export const Breadcrumb: React.FC<BreadcrumbProps> = ({
     }
   }, [mode, currentPath, showHome, maxItems, homeHref, items]);
 
-  const showDropdown = () => {};
-
   useEffect(() => {
     if (typeof window !== "undefined") {
       setCurrentPath(window.location.pathname);
@@ -90,7 +104,20 @@ export const Breadcrumb: React.FC<BreadcrumbProps> = ({
         animate="animate"
         variants={parentVariants}
       >
-        {hiddenItems.length > 0 && (
+        {collapsible ? (
+          <button
+            className="text-gray-600 hover:text-blue-800 transition-colors duration-200 cursor-pointer"
+            onClick={() => setCollapsed(!collapsed)}
+          >
+            {!collapsed ? (
+              <ChevronRight className="inline-block ml-1" />
+            ) : (
+              <ChevronRight className="inline-block ml-1 rotate-90" />
+            )}
+          </button>
+        ) : null}
+
+        {!collapsed && hiddenItems.length > 0 && (
           <motion.div
             className="flex items-center gap-1"
             variants={childVariants}
@@ -115,7 +142,7 @@ export const Breadcrumb: React.FC<BreadcrumbProps> = ({
                       </div>
                     </div>
                     <div className="flex flex-col align-center justify-start gap-2 w-full h-full text-base">
-                      {item.href ? (
+                      {item.href && checkIfCurrentPath(item.href) ? (
                         <motion.a
                           className="hover:text-blue-800 transition-colors duration-200 overflow-auto whitespace-nowrap"
                           href={item.href}
@@ -150,70 +177,71 @@ export const Breadcrumb: React.FC<BreadcrumbProps> = ({
             ) : null}
           </motion.div>
         )}
-        {visibleItems.map((item, index) => {
-          // If showhome is false
-          if (index === 0 && !showHome) {
-            return null;
-          }
+        {!collapsed &&
+          visibleItems.map((item, index) => {
+            // If showhome is false
+            if (index === 0 && !showHome) {
+              return null;
+            }
 
-          return (
-            <motion.div
-              key={index}
-              className="flex items-center gap-1"
-              variants={childVariants}
-            >
-              <div>
-                {index !== 0 && (
-                  <div className="flex items-center justify-center h-full text-gray-400 size-4">
-                    {separator === "chevron" && <ChevronRight />}
-                    {separator === "slash" && <span>/</span>}
-                    {separator === "line" && <LineSeparator />}
-                    {separator === "custom" && customSeparator}
-                  </div>
-                )}
-              </div>
+            return (
               <motion.div
                 key={index}
-                className="flex items-center justify-center gap-1"
+                className="flex items-center gap-1"
+                variants={childVariants}
               >
-                {/* LOGO */}
-                {item.icon ? (
-                  <span className="text-slate-400">{item.icon}</span>
-                ) : null}
+                <div>
+                  {index !== 0 && (
+                    <div className="flex items-center justify-center h-full text-gray-400 size-4">
+                      {separator === "chevron" && <ChevronRight />}
+                      {separator === "slash" && <span>/</span>}
+                      {separator === "line" && <LineSeparator />}
+                      {separator === "custom" && customSeparator}
+                    </div>
+                  )}
+                </div>
+                <motion.div
+                  key={index}
+                  className="flex items-center justify-center gap-1"
+                >
+                  {/* LOGO */}
+                  {item.icon ? (
+                    <span className="text-slate-400">{item.icon}</span>
+                  ) : null}
 
-                {/* LINK */}
-                {item.href ? (
-                  <motion.a
-                    className="hover:text-blue-800  transition-colors duration-200 overflow-auto whitespace-nowrap"
-                    href={item.href}
-                    whileHover={{
-                      scale: 1.05,
-                      transition: { duration: 0.1 },
-                    }}
-                    onClick={() => {
-                      if (onItemClick) {
-                        onItemClick(item, index);
-                      }
-                    }}
-                  >
-                    {item.label}
-                  </motion.a>
-                ) : (
-                  <span
-                    className="overflow-auto whitespace-nowrap"
-                    onClick={() => {
-                      if (onItemClick) {
-                        onItemClick(item, index);
-                      }
-                    }}
-                  >
-                    {item.label}
-                  </span>
-                )}
+                  {/* LINK */}
+                  {item.href && !checkIfCurrentPath(item.href) ? (
+                    <motion.a
+                      className="hover:text-blue-800 transition-colors duration-200 overflow-auto whitespace-nowrap"
+                      href={item.href}
+                      whileHover={{
+                        scale: 1.05,
+                        transition: { duration: 0.1 },
+                      }}
+                      onClick={() => {
+                        if (onItemClick) {
+                          onItemClick(item, index);
+                        }
+                      }}
+                    >
+                      {item.label}
+                    </motion.a>
+                  ) : (
+                    <span
+                      className="overflow-auto whitespace-nowrap"
+                      onClick={() => {
+                        if (onItemClick) {
+                          onItemClick(item, index);
+                        }
+                      }}
+                    >
+                      {item.label}
+                    </span>
+                  )}
+                </motion.div>
               </motion.div>
-            </motion.div>
-          );
-        })}
+            );
+          })}
       </motion.div>
     </nav>
   );
