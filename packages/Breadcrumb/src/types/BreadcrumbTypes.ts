@@ -18,4 +18,5 @@ export interface BreadcrumbProps {
   maxItems?: number;
   onItemClick?: (item: BreadcrumbItem, index: number) => void;
   collapsible?: boolean;
+  noAnimations?: boolean;
 }

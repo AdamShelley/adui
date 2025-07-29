@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useState, useCallback } from "react";
+import { cn } from "../utils/cn";
 import { BreadcrumbItem, BreadcrumbProps } from "./types/BreadcrumbTypes";
 import { ChevronRight } from "lucide-react";
 
@@ -23,12 +24,22 @@ export const Breadcrumb: React.FC<BreadcrumbProps> = ({
   maxItems = 5,
   onItemClick,
   collapsible = false,
+  noAnimations,
 }) => {
   const [visibleItems, setVisibleItems] = React.useState<BreadcrumbItem[]>([]);
   const [hiddenItems, setHiddenItems] = React.useState<BreadcrumbItem[]>([]);
   const [showHiddenDropdown, setShowHiddenDropdown] = useState<boolean>(false);
   const [currentPath, setCurrentPath] = useState("");
   const [collapsed, setCollapsed] = useState<boolean>(collapsible);
+
+  const prefersReducedMotion =
+    typeof window !== "undefined"
+      ? window.matchMedia("(prefers-reduced-motion: reduce)").matches
+      : false;
+
+  // Use explicit user preference if provided, otherwise respect system preference
+  const shouldDisableAnimations =
+    noAnimations !== undefined ? noAnimations : prefersReducedMotion;
 
   const parentVariants = {
     animate: {
@@ -45,16 +56,22 @@ export const Breadcrumb: React.FC<BreadcrumbProps> = ({
 
   const checkIfCurrentPath = useCallback(
     (href: string) => {
-      const currentSegments = currentPath.split("/").filter(Boolean);
-      const hrefSegments = href.split("/").filter(Boolean);
-      const lastCurrentSegment = currentSegments[currentSegments.length - 1];
-      const lastHrefSegment = hrefSegments[hrefSegments.length - 1];
+      // Normalize paths by removing trailing slashes and ensuring they start with /
+      const normalizedCurrentPath =
+        currentPath === "" ? "/" : currentPath.replace(/\/$/, "");
+      const normalizedHref = href.replace(/\/$/, "") || "/";
 
-      return (
-        lastCurrentSegment?.toLowerCase() === lastHrefSegment?.toLowerCase()
-      );
+      // Special case for home button
+      if (normalizedHref === homeHref || normalizedHref === "/") {
+        return (
+          normalizedCurrentPath === "/" || normalizedCurrentPath === homeHref
+        );
+      }
+
+      // For other paths, check if they match exactly
+      return normalizedCurrentPath === normalizedHref;
     },
-    [currentPath]
+    [currentPath, homeHref]
   );
 
   const generateCrumbsFromUrl = useCallback(() => {
@@ -77,6 +94,7 @@ export const Breadcrumb: React.FC<BreadcrumbProps> = ({
         const startIndex = newItems.length - maxItems;
         const newItemsToShow = newItems.slice(startIndex);
         setVisibleItems(newItemsToShow);
+
         setHiddenItems(newItems.slice(0, startIndex));
       } else {
         setVisibleItems(newItems);
@@ -102,7 +120,7 @@ export const Breadcrumb: React.FC<BreadcrumbProps> = ({
         className="flex gap-1 relative"
         initial="initial"
         animate="animate"
-        variants={parentVariants}
+        variants={shouldDisableAnimations ? undefined : parentVariants}
       >
         {collapsible ? (
           <button
@@ -120,7 +138,7 @@ export const Breadcrumb: React.FC<BreadcrumbProps> = ({
         {!collapsed && hiddenItems.length > 0 && (
           <motion.div
             className="flex items-center gap-1"
-            variants={childVariants}
+            variants={shouldDisableAnimations ? undefined : childVariants}
           >
             <span
               className="text-gray-400 font-bold cursor-pointer hover:text-blue-800 transition-colors duration-200"
@@ -130,9 +148,18 @@ export const Breadcrumb: React.FC<BreadcrumbProps> = ({
             </span>
 
             {showHiddenDropdown ? (
-              <div className=" absolute top-6 left-0 bg-white rounded-sm z-10 mt-1">
+              <motion.div
+                variants={shouldDisableAnimations ? undefined : parentVariants}
+                className=" absolute top-6 left-0 bg-white rounded-sm z-10 mt-1"
+              >
                 {hiddenItems.map((item, index) => (
-                  <div className="flex flex-row items-center" key={index}>
+                  <motion.div
+                    variants={
+                      shouldDisableAnimations ? undefined : childVariants
+                    }
+                    className="flex flex-row items-center"
+                    key={index}
+                  >
                     <div>
                       <div className="flex items-center justify-center h-full text-gray-400 size-4">
                         {separator === "chevron" && <ChevronRight />}
@@ -142,14 +169,18 @@ export const Breadcrumb: React.FC<BreadcrumbProps> = ({
                       </div>
                     </div>
                     <div className="flex flex-col align-center justify-start gap-2 w-full h-full text-base">
-                      {item.href && checkIfCurrentPath(item.href) ? (
+                      {item.href && !checkIfCurrentPath(item.href) ? (
                         <motion.a
                           className="hover:text-blue-800 transition-colors duration-200 overflow-auto whitespace-nowrap"
                           href={item.href}
-                          whileHover={{
-                            scale: 1.05,
-                            transition: { duration: 0.1 },
-                          }}
+                          whileHover={
+                            shouldDisableAnimations
+                              ? undefined
+                              : {
+                                  scale: 1.05,
+                                  transition: { duration: 0.1 },
+                                }
+                          }
                           onClick={() => {
                             if (onItemClick) {
                               onItemClick(item, index);
@@ -160,7 +191,12 @@ export const Breadcrumb: React.FC<BreadcrumbProps> = ({
                         </motion.a>
                       ) : (
                         <span
-                          className="overflow-auto whitespace-nowrap"
+                          className={cn(
+                            "overflow-auto whitespace-nowrap",
+                            checkIfCurrentPath(item.href || "")
+                              ? "text-blue-600 font-bold"
+                              : ""
+                          )}
                           onClick={() => {
                             if (onItemClick) {
                               onItemClick(item, index);
@@ -171,9 +207,9 @@ export const Breadcrumb: React.FC<BreadcrumbProps> = ({
                         </span>
                       )}
                     </div>
-                  </div>
+                  </motion.div>
                 ))}
-              </div>
+              </motion.div>
             ) : null}
           </motion.div>
         )}
@@ -188,7 +224,7 @@ export const Breadcrumb: React.FC<BreadcrumbProps> = ({
               <motion.div
                 key={index}
                 className="flex items-center gap-1"
-                variants={childVariants}
+                variants={shouldDisableAnimations ? undefined : childVariants}
               >
                 <div>
                   {index !== 0 && (
@@ -214,10 +250,14 @@ export const Breadcrumb: React.FC<BreadcrumbProps> = ({
                     <motion.a
                       className="hover:text-blue-800 transition-colors duration-200 overflow-auto whitespace-nowrap"
                       href={item.href}
-                      whileHover={{
-                        scale: 1.05,
-                        transition: { duration: 0.1 },
-                      }}
+                      whileHover={
+                        shouldDisableAnimations
+                          ? undefined
+                          : {
+                              scale: 1.05,
+                              transition: { duration: 0.1 },
+                            }
+                      }
                       onClick={() => {
                         if (onItemClick) {
                           onItemClick(item, index);
@@ -228,7 +268,12 @@ export const Breadcrumb: React.FC<BreadcrumbProps> = ({
                     </motion.a>
                   ) : (
                     <span
-                      className="overflow-auto whitespace-nowrap"
+                      className={cn(
+                        "overflow-auto whitespace-nowrap",
+                        checkIfCurrentPath(item.href || "")
+                          ? "text-blue-600 font-bold"
+                          : ""
+                      )}
                       onClick={() => {
                         if (onItemClick) {
                           onItemClick(item, index);
