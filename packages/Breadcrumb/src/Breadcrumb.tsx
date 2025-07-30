@@ -115,7 +115,7 @@ export const Breadcrumb: React.FC<BreadcrumbProps> = ({
   }, [mode, generateCrumbsFromUrl]);
 
   return (
-    <nav className={`${className}`} aria-label="breadcrumb">
+    <nav className={`${className}`} aria-label="Page navigation breadcrumb">
       <motion.div
         className="flex gap-1 relative"
         initial="initial"
@@ -126,6 +126,7 @@ export const Breadcrumb: React.FC<BreadcrumbProps> = ({
           <button
             className="text-gray-600 hover:text-blue-800 transition-colors duration-200 cursor-pointer"
             onClick={() => setCollapsed(!collapsed)}
+            aria-label={collapsed ? "Expand breadcrumb" : "Collapse breadcrumb"}
           >
             {!collapsed ? (
               <ChevronRight className="inline-block ml-1" />
@@ -143,6 +144,7 @@ export const Breadcrumb: React.FC<BreadcrumbProps> = ({
             <span
               className="text-gray-400 font-bold cursor-pointer hover:text-blue-800 transition-colors duration-200"
               onClick={() => setShowHiddenDropdown(!showHiddenDropdown)}
+              aria-expanded={showHiddenDropdown}
             >
               ...
             </span>
@@ -171,13 +173,12 @@ export const Breadcrumb: React.FC<BreadcrumbProps> = ({
                     <div className="flex flex-col align-center justify-start gap-2 w-full h-full text-base">
                       {item.href && !checkIfCurrentPath(item.href) ? (
                         <motion.a
-                          className="hover:text-blue-800 transition-colors duration-200 overflow-auto whitespace-nowrap"
+                          className="text-gray-500 hover:text-gray-900 transition-colors duration-200 overflow-auto whitespace-nowrap"
                           href={item.href}
                           whileHover={
                             shouldDisableAnimations
                               ? undefined
                               : {
-                                  scale: 1.05,
                                   transition: { duration: 0.1 },
                                 }
                           }
@@ -202,6 +203,11 @@ export const Breadcrumb: React.FC<BreadcrumbProps> = ({
                               onItemClick(item, index);
                             }
                           }}
+                          aria-current={
+                            checkIfCurrentPath(item.href || "")
+                              ? "page"
+                              : undefined
+                          }
                         >
                           {item.label}
                         </span>
@@ -248,13 +254,12 @@ export const Breadcrumb: React.FC<BreadcrumbProps> = ({
                   {/* LINK */}
                   {item.href && !checkIfCurrentPath(item.href) ? (
                     <motion.a
-                      className="hover:text-blue-800 transition-colors duration-200 overflow-auto whitespace-nowrap"
+                      className="text-gray-500 hover:text-gray-900 transition-colors duration-200 overflow-auto whitespace-nowrap"
                       href={item.href}
                       whileHover={
                         shouldDisableAnimations
                           ? undefined
                           : {
-                              scale: 1.05,
                               transition: { duration: 0.1 },
                             }
                       }
@@ -279,6 +284,9 @@ export const Breadcrumb: React.FC<BreadcrumbProps> = ({
                           onItemClick(item, index);
                         }
                       }}
+                      aria-current={
+                        checkIfCurrentPath(item.href || "") ? "page" : undefined
+                      }
                     >
                       {item.label}
                     </span>

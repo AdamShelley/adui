@@ -36,7 +36,7 @@ function App() {
           onItemClick={handleBreadcrumbClick}
           showHome={true}
           // noAnimations={true}
-          collapsible={true}
+          // collapsible={true}
         />
       </main>
     </div>
