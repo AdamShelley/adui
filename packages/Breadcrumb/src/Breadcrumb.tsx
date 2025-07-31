@@ -1,9 +1,7 @@
-"use client";
-
 import React, { useEffect, useState, useCallback } from "react";
 import { cn } from "../utils/cn";
 import { BreadcrumbItem, BreadcrumbProps } from "./types/BreadcrumbTypes";
-import { ChevronRight } from "lucide-react";
+import { ChevronRight, Home } from "lucide-react";
 
 import { motion } from "motion/react";
 
@@ -19,8 +17,10 @@ export const Breadcrumb: React.FC<BreadcrumbProps> = ({
   separator = "chevron",
   customSeparator,
   showHome = true,
+  homeLabel = "",
   homeHref = "/",
-  className = "",
+  navClassName = "",
+  crumbClassNames = "",
   maxItems = 5,
   onItemClick,
   collapsible = false,
@@ -85,7 +85,8 @@ export const Breadcrumb: React.FC<BreadcrumbProps> = ({
           icon: null,
         };
       });
-      if (showHome) {
+
+      if (!showHome) {
         newItems.unshift({ label: "Home", href: homeHref, icon: null });
       }
 
@@ -115,7 +116,10 @@ export const Breadcrumb: React.FC<BreadcrumbProps> = ({
   }, [mode, generateCrumbsFromUrl]);
 
   return (
-    <nav className={`${className}`} aria-label="Page navigation breadcrumb">
+    <nav
+      className={cn("w-fit", navClassName)}
+      aria-label="Page navigation breadcrumb"
+    >
       <motion.div
         className="flex gap-1 relative"
         initial="initial"
@@ -134,6 +138,23 @@ export const Breadcrumb: React.FC<BreadcrumbProps> = ({
               <ChevronRight className="inline-block ml-1 rotate-90" />
             )}
           </button>
+        ) : null}
+
+        {showHome ? (
+          <motion.div className="flex items-center">
+            <motion.a
+              className="text-gray-500 hover:text-gray-900 transition-colors duration-200 overflow-auto whitespace-nowrap flex items-center justify-center"
+              href={homeHref}
+              onClick={() => {
+                if (onItemClick) {
+                  onItemClick({ label: "Home", href: homeHref }, 0);
+                }
+              }}
+            >
+              <Home className=" size-4" />
+              {homeLabel ? <span className="ml-1">{homeLabel}</span> : null}
+            </motion.a>
+          </motion.div>
         ) : null}
 
         {!collapsed && hiddenItems.length > 0 && (
@@ -229,7 +250,7 @@ export const Breadcrumb: React.FC<BreadcrumbProps> = ({
             return (
               <motion.div
                 key={index}
-                className="flex items-center gap-1"
+                className={cn("flex items-center gap-1")}
                 variants={shouldDisableAnimations ? undefined : childVariants}
               >
                 <div>
@@ -254,7 +275,10 @@ export const Breadcrumb: React.FC<BreadcrumbProps> = ({
                   {/* LINK */}
                   {item.href && !checkIfCurrentPath(item.href) ? (
                     <motion.a
-                      className="text-gray-500 hover:text-gray-900 transition-colors duration-200 overflow-auto whitespace-nowrap"
+                      className={cn(
+                        "text-gray-500 hover:text-gray-900 transition-colors duration-200 overflow-auto whitespace-nowrap",
+                        crumbClassNames
+                      )}
                       href={item.href}
                       whileHover={
                         shouldDisableAnimations
@@ -277,7 +301,8 @@ export const Breadcrumb: React.FC<BreadcrumbProps> = ({
                         "overflow-auto whitespace-nowrap",
                         checkIfCurrentPath(item.href || "")
                           ? "text-blue-600 font-bold"
-                          : ""
+                          : "",
+                        crumbClassNames
                       )}
                       onClick={() => {
                         if (onItemClick) {
