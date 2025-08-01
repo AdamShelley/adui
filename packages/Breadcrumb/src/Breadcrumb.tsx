@@ -112,8 +112,10 @@ export const Breadcrumb: React.FC<BreadcrumbProps> = ({
 
     if (mode === "url-based") {
       generateCrumbsFromUrl();
+    } else if (mode === "custom") {
+      setVisibleItems(items);
     }
-  }, [mode, generateCrumbsFromUrl]);
+  }, [mode, generateCrumbsFromUrl, items]);
 
   return (
     <nav

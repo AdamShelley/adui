@@ -32,9 +32,10 @@ function App() {
       <main className="mt-5">
         <Breadcrumb
           mode="url-based"
-          items={sampleItems}
+          // mode="custom"
+          // items={sampleItems}
           onItemClick={handleBreadcrumbClick}
-          showHome={true}
+          showHome={false}
           // navClassName="bg-gray-100 p-2 rounded shadow"
           // crumbClassNames="text-red-500 hover:text-red-700 transition-colors"
           // noAnimations={true}
