@@ -100,7 +100,7 @@ export const Breadcrumb: React.FC<BreadcrumbProps> = ({
       } else {
         setVisibleItems(newItems);
       }
-    } else {
+    } else if (mode === "custom" && items?.length) {
       setVisibleItems(items);
     }
   }, [mode, currentPath, showHome, maxItems, homeHref, items]);
@@ -112,7 +112,7 @@ export const Breadcrumb: React.FC<BreadcrumbProps> = ({
 
     if (mode === "url-based") {
       generateCrumbsFromUrl();
-    } else if (mode === "custom") {
+    } else if (mode === "custom" && items?.length) {
       setVisibleItems(items);
     }
   }, [mode, generateCrumbsFromUrl, items]);
@@ -131,7 +131,10 @@ export const Breadcrumb: React.FC<BreadcrumbProps> = ({
         {collapsible ? (
           <button
             className="text-gray-600 hover:text-blue-800 transition-colors duration-200 cursor-pointer"
-            onClick={() => setCollapsed(!collapsed)}
+            onClick={() => {
+              setCollapsed(!collapsed);
+              setShowHiddenDropdown(false);
+            }}
             aria-label={collapsed ? "Expand breadcrumb" : "Collapse breadcrumb"}
           >
             {!collapsed ? (
