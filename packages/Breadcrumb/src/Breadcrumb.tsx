@@ -45,6 +45,8 @@ export const Breadcrumb: React.FC<BreadcrumbProps> = ({
     animate: {
       transition: {
         staggerChildren: 0.05,
+        ease: "easeOut",
+        duration: 0.2,
       },
     },
   };
@@ -52,6 +54,7 @@ export const Breadcrumb: React.FC<BreadcrumbProps> = ({
   const childVariants = {
     initial: { opacity: 0, x: 20 },
     animate: { opacity: 1, x: 0 },
+    transition: { ease: "easeOut", duration: 0.2 },
   };
 
   const checkIfCurrentPath = useCallback(
@@ -86,7 +89,7 @@ export const Breadcrumb: React.FC<BreadcrumbProps> = ({
         };
       });
 
-      if (!showHome) {
+      if (showHome && pathParts.length > 0) {
         newItems.unshift({ label: "Home", href: homeHref, icon: null });
       }
 
@@ -128,9 +131,11 @@ export const Breadcrumb: React.FC<BreadcrumbProps> = ({
         animate="animate"
         variants={shouldDisableAnimations ? undefined : parentVariants}
       >
-        {collapsible ? (
+        {collapsible &&
+        visibleItems.length >= 1 &&
+        !checkIfCurrentPath(homeHref) ? (
           <button
-            className="text-gray-600 hover:text-blue-800 transition-colors duration-200 cursor-pointer"
+            className="text-gray-500 hover:text-blue-800 transition-colors duration-200 cursor-pointer"
             onClick={() => {
               setCollapsed(!collapsed);
               setShowHiddenDropdown(false);
