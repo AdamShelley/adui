@@ -5,7 +5,7 @@ import { ChevronRight, Home } from "lucide-react";
 
 import { motion } from "motion/react";
 
-const LineSeparator = () => (
+export const LineSeparator = () => (
   <div className="flex items-center justify-center">
     <div className="h-1 w-4 bg-gray-800 rounded-xs "></div>
   </div>
@@ -134,20 +134,29 @@ export const Breadcrumb: React.FC<BreadcrumbProps> = ({
         {collapsible &&
         visibleItems.length >= 1 &&
         !checkIfCurrentPath(homeHref) ? (
-          <button
-            className="text-gray-500 hover:text-blue-800 transition-colors duration-200 cursor-pointer"
+          <motion.button
+            className="text-gray-500 hover:text-blue-800 transition-colors duration-200 cursor-pointer flex items-center justify-center"
             onClick={() => {
               setCollapsed(!collapsed);
               setShowHiddenDropdown(false);
             }}
             aria-label={collapsed ? "Expand breadcrumb" : "Collapse breadcrumb"}
+            whileTap={noAnimations ? undefined : { scale: 0.95 }}
           >
-            {!collapsed ? (
-              <ChevronRight className="inline-block ml-1" />
-            ) : (
-              <ChevronRight className="inline-block ml-1 rotate-90" />
-            )}
-          </button>
+            <motion.div
+              animate={
+                noAnimations ? undefined : { rotate: collapsed ? 90 : 0 }
+              }
+              transition={
+                noAnimations ? undefined : { duration: 0.2, ease: "easeInOut" }
+              }
+              className={`inline-block ml-1 ${
+                noAnimations && collapsed ? "rotate-90" : ""
+              }`}
+            >
+              <ChevronRight />
+            </motion.div>
+          </motion.button>
         ) : null}
 
         {showHome ? (

@@ -1,5 +1,5 @@
 import { AppleIcon, Home, Laptop, Store } from "lucide-react";
-import { Breadcrumb } from "./Breadcrumb";
+import { Breadcrumb, LineSeparator } from "./Breadcrumb";
 import { BreadcrumbItem } from "./types/BreadcrumbTypes";
 
 function App() {
@@ -10,6 +10,7 @@ function App() {
     {
       label: "Electronics",
       href: "/products/electronics",
+      icon: <LineSeparator />,
     },
     {
       label: "Laptops",
@@ -35,7 +36,7 @@ function App() {
           // mode="custom"
           // items={sampleItems}
           onItemClick={handleBreadcrumbClick}
-          showHome={false}
+          showHome={true}
           // navClassName="bg-gray-100 p-2 rounded shadow"
           // crumbClassNames="text-red-500 hover:text-red-700 transition-colors"
           // noAnimations={true}
