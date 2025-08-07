@@ -7,7 +7,7 @@ import { motion } from "motion/react";
 
 export const LineSeparator = () => (
   <div className="flex items-center justify-center">
-    <div className="h-1 w-4 bg-gray-800 rounded-xs "></div>
+    <div className="h-[1px] w-3 bg-gray-800 rounded-xs "></div>
   </div>
 );
 
@@ -99,7 +99,9 @@ export const Breadcrumb: React.FC<BreadcrumbProps> = ({
         const newItemsToShow = newItems.slice(startIndex);
         setVisibleItems(newItemsToShow);
 
-        setHiddenItems(newItems.slice(0, startIndex));
+        const hiddenItemsReversed = newItems.slice(0, startIndex).reverse();
+
+        setHiddenItems(hiddenItemsReversed);
       } else {
         setVisibleItems(newItems);
       }
@@ -148,7 +150,7 @@ export const Breadcrumb: React.FC<BreadcrumbProps> = ({
                 noAnimations ? undefined : { rotate: collapsed ? 90 : 0 }
               }
               transition={
-                noAnimations ? undefined : { duration: 0.2, ease: "easeInOut" }
+                noAnimations ? undefined : { duration: 0.1, ease: "easeOut" }
               }
               className={`inline-block ml-1 ${
                 noAnimations && collapsed ? "rotate-90" : ""
@@ -235,7 +237,7 @@ export const Breadcrumb: React.FC<BreadcrumbProps> = ({
                           className={cn(
                             "overflow-auto whitespace-nowrap",
                             checkIfCurrentPath(item.href || "")
-                              ? "text-blue-600 font-bold"
+                              ? "text-blue-600 font-semibold"
                               : ""
                           )}
                           onClick={() => {
@@ -262,9 +264,9 @@ export const Breadcrumb: React.FC<BreadcrumbProps> = ({
         {!collapsed &&
           visibleItems.map((item, index) => {
             // If showhome is false
-            if (index === 0 && !showHome) {
-              return null;
-            }
+            // if (index === 0 && !showHome) {
+            //   return null;
+            // }
 
             return (
               <motion.div
@@ -319,7 +321,7 @@ export const Breadcrumb: React.FC<BreadcrumbProps> = ({
                       className={cn(
                         "overflow-auto whitespace-nowrap",
                         checkIfCurrentPath(item.href || "")
-                          ? "text-blue-600 font-bold"
+                          ? "text-blue-600 font-semibold"
                           : "",
                         crumbClassNames
                       )}
