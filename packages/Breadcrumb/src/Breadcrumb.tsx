@@ -137,7 +137,7 @@ export const Breadcrumb: React.FC<BreadcrumbProps> = ({
         visibleItems.length >= 1 &&
         !checkIfCurrentPath(homeHref) ? (
           <motion.button
-            className="text-gray-500 hover:text-blue-800 transition-colors duration-200 cursor-pointer flex items-center justify-center"
+            className="text-gray-500 hover:text-blue-800 transition-colors duration-200 cursor-pointer flex items-center justify-center dark:text-white/70 hover:dark:text-slate-400"
             onClick={() => {
               setCollapsed(!collapsed);
               setShowHiddenDropdown(false);
@@ -164,7 +164,7 @@ export const Breadcrumb: React.FC<BreadcrumbProps> = ({
         {showHome ? (
           <motion.div className="flex items-center">
             <motion.a
-              className="text-gray-500 hover:text-gray-900 transition-colors duration-200 overflow-auto whitespace-nowrap flex items-center justify-center"
+              className="text-gray-500 hover:text-gray-900 transition-colors duration-200 overflow-auto whitespace-nowrap flex items-center justify-center dark:text-white/90 hover:dark:text-white/80"
               href={homeHref}
               onClick={() => {
                 if (onItemClick) {
@@ -184,7 +184,7 @@ export const Breadcrumb: React.FC<BreadcrumbProps> = ({
             variants={shouldDisableAnimations ? undefined : childVariants}
           >
             <span
-              className="text-gray-400 font-bold cursor-pointer hover:text-blue-800 transition-colors duration-200"
+              className="text-gray-400 font-bold cursor-pointer hover:text-blue-800 transition-colors duration-200 dark:text-white/70 hover:dark:text-slate-400"
               onClick={() => setShowHiddenDropdown(!showHiddenDropdown)}
               aria-expanded={showHiddenDropdown}
             >
@@ -194,7 +194,7 @@ export const Breadcrumb: React.FC<BreadcrumbProps> = ({
             {showHiddenDropdown ? (
               <motion.div
                 variants={shouldDisableAnimations ? undefined : parentVariants}
-                className=" absolute top-6 left-0 bg-white rounded-sm z-10 mt-1"
+                className=" absolute top-6 left-0 bg-white rounded-sm z-10 mt-1 dark:bg-transparent"
               >
                 {hiddenItems.map((item, index) => (
                   <motion.div
@@ -215,7 +215,7 @@ export const Breadcrumb: React.FC<BreadcrumbProps> = ({
                     <div className="flex flex-col align-center justify-start gap-2 w-full h-full text-base">
                       {item.href && !checkIfCurrentPath(item.href) ? (
                         <motion.a
-                          className="text-gray-500 hover:text-gray-900 transition-colors duration-200 overflow-auto whitespace-nowrap"
+                          className="text-gray-500 hover:text-gray-900 transition-colors duration-200 overflow-auto whitespace-nowrap dark:text-white/90 hover:dark:text-white/80"
                           href={item.href}
                           whileHover={
                             shouldDisableAnimations
@@ -263,11 +263,6 @@ export const Breadcrumb: React.FC<BreadcrumbProps> = ({
         )}
         {!collapsed &&
           visibleItems.map((item, index) => {
-            // If showhome is false
-            // if (index === 0 && !showHome) {
-            //   return null;
-            // }
-
             return (
               <motion.div
                 key={index}
@@ -276,7 +271,7 @@ export const Breadcrumb: React.FC<BreadcrumbProps> = ({
               >
                 <div>
                   {index !== 0 && (
-                    <div className="flex items-center justify-center h-full text-gray-400 size-4">
+                    <div className="flex items-center justify-center h-full text-gray-400 size-4 dark:text-white/70">
                       {separator === "chevron" && <ChevronRight />}
                       {separator === "slash" && <span>/</span>}
                       {separator === "line" && <LineSeparator />}
@@ -297,7 +292,7 @@ export const Breadcrumb: React.FC<BreadcrumbProps> = ({
                   {item.href && !checkIfCurrentPath(item.href) ? (
                     <motion.a
                       className={cn(
-                        "text-gray-500 hover:text-gray-900 transition-colors duration-200 overflow-auto whitespace-nowrap",
+                        "text-gray-500 hover:text-gray-900 transition-colors duration-200 overflow-auto whitespace-nowrap dark:text-white/90 hover:dark:text-white/80",
                         crumbClassNames
                       )}
                       href={item.href}
@@ -321,7 +316,7 @@ export const Breadcrumb: React.FC<BreadcrumbProps> = ({
                       className={cn(
                         "overflow-auto whitespace-nowrap",
                         checkIfCurrentPath(item.href || "")
-                          ? "text-blue-600 font-semibold"
+                          ? "text-blue-600 font-semibold dark:text-blue-400"
                           : "",
                         crumbClassNames
                       )}

@@ -25,7 +25,7 @@ function App() {
   };
 
   return (
-    <div className="w-screen h-screen flex flex-col p-4">
+    <div className="w-screen h-screen flex flex-col p-4 bg-gray-950">
       <header className="text-center mb-4">
         <h1 className="font-bold">Breadcrumb Component Development</h1>
       </header>
@@ -36,12 +36,12 @@ function App() {
           // mode="custom"
           // items={sampleItems}
           onItemClick={handleBreadcrumbClick}
-          showHome={false}
-          // homeLabel="Home"
+          showHome={true}
+          homeLabel="Home"
           // navClassName="bg-gray-100 p-2 rounded shadow"
           // crumbClassNames="text-red-500 hover:text-red-700 transition-colors"
           // noAnimations={true}
-          collapsible={false}
+          collapsible={true}
         />
       </main>
     </div>
