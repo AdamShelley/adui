@@ -7,14 +7,14 @@ import { motion } from "motion/react";
 
 export const LineSeparator = () => (
   <div className="flex items-center justify-center">
-    <div className="h-[1px] w-3 bg-gray-800 rounded-xs "></div>
+    <div className="h-[1px] w-3 bg-gray-800 rounded-xs dark:bg-white"></div>
   </div>
 );
 
 export const Breadcrumb: React.FC<BreadcrumbProps> = ({
   mode = "url-based",
   items,
-  separator = "chevron",
+  separator = "custom",
   customSeparator,
   showHome = true,
   homeLabel = "",
@@ -164,7 +164,7 @@ export const Breadcrumb: React.FC<BreadcrumbProps> = ({
         {showHome ? (
           <motion.div className="flex items-center">
             <motion.a
-              className="text-gray-500 hover:text-gray-900 transition-colors duration-200 overflow-auto whitespace-nowrap flex items-center justify-center dark:text-white/90 hover:dark:text-white/80"
+              className="text-gray-500 hover:text-gray-900 transition-colors duration-200 overflow-auto whitespace-nowrap flex items-center justify-center dark:text-white/80 hover:dark:text-white/80"
               href={homeHref}
               onClick={() => {
                 if (onItemClick) {
