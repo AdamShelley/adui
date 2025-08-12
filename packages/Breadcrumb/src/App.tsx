@@ -41,7 +41,7 @@ function App() {
           // navClassName="bg-gray-100 p-2 rounded shadow"
           // crumbClassNames="text-red-500 hover:text-red-700 transition-colors"
           // noAnimations={true}
-          collapsible={true}
+          collapsible={false}
         />
       </main>
     </div>

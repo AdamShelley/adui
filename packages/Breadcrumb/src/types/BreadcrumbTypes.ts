@@ -14,7 +14,6 @@ export interface BreadcrumbProps {
   homeLabel?: string;
   homeHref?: string;
   variant?: "default" | "pills" | "minimal" | "bordered";
-  size?: "sm" | "md" | "lg";
   navClassName?: string;
   crumbClassNames?: string;
   maxItems?: number;

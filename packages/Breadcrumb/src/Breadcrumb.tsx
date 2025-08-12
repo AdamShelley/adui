@@ -14,7 +14,7 @@ export const LineSeparator = () => (
 export const Breadcrumb: React.FC<BreadcrumbProps> = ({
   mode = "url-based",
   items,
-  separator = "custom",
+  separator = "chevron",
   customSeparator,
   showHome = true,
   homeLabel = "",
@@ -172,7 +172,7 @@ export const Breadcrumb: React.FC<BreadcrumbProps> = ({
                 }
               }}
             >
-              <Home className=" size-4" />
+              <Home className=" size-4 dark:text-white/60 hover:dark:text-white/50" />
               {homeLabel ? <span className="ml-1">{homeLabel}</span> : null}
             </motion.a>
           </motion.div>
@@ -285,7 +285,9 @@ export const Breadcrumb: React.FC<BreadcrumbProps> = ({
                 >
                   {/* LOGO */}
                   {item.icon ? (
-                    <span className="text-slate-400">{item.icon}</span>
+                    <span className="text-slate-400 dark:text-white/80">
+                      {item.icon}
+                    </span>
                   ) : null}
 
                   {/* LINK */}
