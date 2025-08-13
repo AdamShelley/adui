@@ -13,7 +13,7 @@ export interface BreadcrumbProps {
   showHome?: boolean;
   homeLabel?: string;
   homeHref?: string;
-  variant?: "default" | "pills" | "minimal" | "bordered";
+  variant?: "default" | "pills" | "bordered";
   navClassName?: string;
   crumbClassNames?: string;
   maxItems?: number;

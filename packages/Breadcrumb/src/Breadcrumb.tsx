@@ -19,6 +19,7 @@ export const Breadcrumb: React.FC<BreadcrumbProps> = ({
   showHome = true,
   homeLabel = "",
   homeHref = "/",
+  variant = "default",
   navClassName = "",
   crumbClassNames = "",
   maxItems = 5,
@@ -89,10 +90,6 @@ export const Breadcrumb: React.FC<BreadcrumbProps> = ({
         };
       });
 
-      if (showHome && pathParts.length > 0) {
-        newItems.unshift({ label: "Home", href: homeHref, icon: null });
-      }
-
       // Limit the number of items based on maxItems
       if (newItems.length > maxItems) {
         const startIndex = newItems.length - maxItems;
@@ -108,7 +105,7 @@ export const Breadcrumb: React.FC<BreadcrumbProps> = ({
     } else if (mode === "custom" && items?.length) {
       setVisibleItems(items);
     }
-  }, [mode, currentPath, showHome, maxItems, homeHref, items]);
+  }, [mode, currentPath, maxItems, items]);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -164,7 +161,11 @@ export const Breadcrumb: React.FC<BreadcrumbProps> = ({
         {showHome ? (
           <motion.div className="flex items-center">
             <motion.a
-              className="text-gray-500 hover:text-gray-900 transition-colors duration-200 overflow-auto whitespace-nowrap flex items-center justify-center dark:text-white/80 hover:dark:text-white/80"
+              className={cn(
+                "text-gray-500 hover:text-gray-900 transition-colors duration-200 overflow-auto whitespace-nowrap flex items-center justify-center dark:text-white/80 hover:dark:text-white/80",
+                variant === "pills" &&
+                  "rounded-full border dark:border-gray-600 px-3 py-1"
+              )}
               href={homeHref}
               onClick={() => {
                 if (onItemClick) {
@@ -194,7 +195,10 @@ export const Breadcrumb: React.FC<BreadcrumbProps> = ({
             {showHiddenDropdown ? (
               <motion.div
                 variants={shouldDisableAnimations ? undefined : parentVariants}
-                className=" absolute top-6 left-0 bg-white rounded-sm z-10 mt-1 dark:bg-transparent"
+                className={cn(
+                  "absolute top-6 left-0 bg-white rounded-sm z-10 mt-1 dark:bg-transparent",
+                  variant !== "default" && "mt-6"
+                )}
               >
                 {hiddenItems.map((item, index) => (
                   <motion.div
@@ -204,18 +208,24 @@ export const Breadcrumb: React.FC<BreadcrumbProps> = ({
                     className="flex flex-row items-center"
                     key={index}
                   >
-                    <div>
-                      <div className="flex items-center justify-center h-full text-gray-400 size-4">
-                        {separator === "chevron" && <ChevronRight />}
-                        {separator === "slash" && <span>/</span>}
-                        {separator === "line" && <LineSeparator />}
-                        {separator === "custom" && customSeparator}
+                    {variant === "default" ? (
+                      <div>
+                        <div className="flex items-center justify-center h-full text-gray-400 size-4">
+                          {separator === "chevron" && <ChevronRight />}
+                          {separator === "slash" && <span>/</span>}
+                          {separator === "line" && <LineSeparator />}
+                          {separator === "custom" && customSeparator}
+                        </div>
                       </div>
-                    </div>
+                    ) : null}
                     <div className="flex flex-col align-center justify-start gap-2 w-full h-full text-base">
                       {item.href && !checkIfCurrentPath(item.href) ? (
                         <motion.a
-                          className="text-gray-500 hover:text-gray-900 transition-colors duration-200 overflow-auto whitespace-nowrap dark:text-white/90 hover:dark:text-white/80"
+                          className={cn(
+                            "text-gray-500 hover:text-gray-900 transition-colors duration-200 overflow-auto whitespace-nowrap dark:text-white/90 hover:dark:text-white/80",
+                            variant === "pills" &&
+                              "rounded-full border dark:border-gray-600 px-3 py-1 mt-2"
+                          )}
                           href={item.href}
                           whileHover={
                             shouldDisableAnimations
@@ -295,6 +305,8 @@ export const Breadcrumb: React.FC<BreadcrumbProps> = ({
                     <motion.a
                       className={cn(
                         "text-gray-500 hover:text-gray-900 transition-colors duration-200 overflow-auto whitespace-nowrap dark:text-white/90 hover:dark:text-white/80",
+                        variant === "pills" &&
+                          "rounded-full border dark:border-gray-600 px-3 py-1",
                         crumbClassNames
                       )}
                       href={item.href}
@@ -320,6 +332,8 @@ export const Breadcrumb: React.FC<BreadcrumbProps> = ({
                         checkIfCurrentPath(item.href || "")
                           ? "text-blue-600 font-semibold dark:text-blue-400"
                           : "",
+                        variant === "pills" &&
+                          "rounded-full border dark:border-gray-600 px-3 py-1",
                         crumbClassNames
                       )}
                       onClick={() => {
