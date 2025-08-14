@@ -164,7 +164,9 @@ export const Breadcrumb: React.FC<BreadcrumbProps> = ({
               className={cn(
                 "text-gray-500 hover:text-gray-900 transition-colors duration-200 overflow-auto whitespace-nowrap flex items-center justify-center dark:text-white/80 hover:dark:text-white/80",
                 variant === "pills" &&
-                  "rounded-full border dark:border-gray-600 px-3 py-1"
+                  "rounded-full border dark:border-gray-600 px-3 py-1",
+                variant === "bordered" &&
+                  "rounded-sm border dark:border-gray-600 px-3 py-1"
               )}
               href={homeHref}
               onClick={() => {
@@ -197,7 +199,9 @@ export const Breadcrumb: React.FC<BreadcrumbProps> = ({
                 variants={shouldDisableAnimations ? undefined : parentVariants}
                 className={cn(
                   "absolute top-6 left-0 bg-white rounded-sm z-10 mt-1 dark:bg-transparent",
-                  variant !== "default" && "mt-6"
+                  variant !== "default" && "mt-6",
+                  variant === "bordered" &&
+                    "rounded-sm border dark:border-gray-600 px-3 py-1 mt-5"
                 )}
               >
                 {hiddenItems.map((item, index) => (
@@ -307,6 +311,8 @@ export const Breadcrumb: React.FC<BreadcrumbProps> = ({
                         "text-gray-500 hover:text-gray-900 transition-colors duration-200 overflow-auto whitespace-nowrap dark:text-white/90 hover:dark:text-white/80",
                         variant === "pills" &&
                           "rounded-full border dark:border-gray-600 px-3 py-1",
+                        variant === "bordered" &&
+                          "rounded-sm border dark:border-gray-600 px-3 py-1",
                         crumbClassNames
                       )}
                       href={item.href}
@@ -334,6 +340,8 @@ export const Breadcrumb: React.FC<BreadcrumbProps> = ({
                           : "",
                         variant === "pills" &&
                           "rounded-full border dark:border-gray-600 px-3 py-1",
+                        variant === "bordered" &&
+                          "rounded-sm border dark:border-gray-600 px-3 py-1",
                         crumbClassNames
                       )}
                       onClick={() => {
