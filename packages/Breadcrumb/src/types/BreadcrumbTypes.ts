@@ -6,7 +6,7 @@ export interface BreadcrumbItem {
 }
 
 export interface BreadcrumbProps {
-  mode: "url-based" | "custom";
+  mode: "url" | "custom";
   items?: BreadcrumbItem[];
   separator?: "chevron" | "slash" | "line" | "custom";
   customSeparator?: React.ReactNode;

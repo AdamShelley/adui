@@ -12,7 +12,7 @@ export const LineSeparator = () => (
 );
 
 export const Breadcrumb: React.FC<BreadcrumbProps> = ({
-  mode = "url-based",
+  mode = "url",
   items,
   separator = "chevron",
   customSeparator,
@@ -79,7 +79,7 @@ export const Breadcrumb: React.FC<BreadcrumbProps> = ({
   );
 
   const generateCrumbsFromUrl = useCallback(() => {
-    if (mode === "url-based") {
+    if (mode === "url") {
       const pathParts = currentPath.split("/").filter(Boolean);
       const newItems: BreadcrumbItem[] = pathParts.map((part, index) => {
         const href = `/${pathParts.slice(0, index + 1).join("/")}`;
@@ -112,7 +112,7 @@ export const Breadcrumb: React.FC<BreadcrumbProps> = ({
       setCurrentPath(window.location.pathname);
     }
 
-    if (mode === "url-based") {
+    if (mode === "url") {
       generateCrumbsFromUrl();
     } else if (mode === "custom" && items?.length) {
       setVisibleItems(items);

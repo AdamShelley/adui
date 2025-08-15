@@ -25,14 +25,14 @@ function App() {
   };
 
   return (
-    <div className="w-screen h-screen flex flex-col p-4 bg-gray-950">
+    <div className="w-screen h-screen flex flex-col p-4 ">
       <header className="text-center mb-4">
         <h1 className="font-bold">Breadcrumb Component Development</h1>
       </header>
 
       <main className="mt-5">
         <Breadcrumb
-          mode="url-based"
+          mode="url"
           // mode="custom"
           // items={sampleItems}
           onItemClick={handleBreadcrumbClick}
@@ -43,7 +43,7 @@ function App() {
           // noAnimations={true}
           separator="chevron"
           maxItems={10}
-          variant="bordered"
+          variant="default"
           collapsible={false}
         />
       </main>
