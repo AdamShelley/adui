@@ -25,29 +25,33 @@ function App() {
   };
 
   return (
-    <div className="w-screen h-screen flex flex-col p-4 ">
-      <header className="text-center mb-4">
-        <h1 className="font-bold">Breadcrumb Component Development</h1>
-      </header>
+    <html>
+      <div className="w-screen h-screen flex flex-col p-4 dark dark:bg-gray-950">
+        <header className="text-center mb-4">
+          <h1 className="font-bold dark:text-white">
+            Breadcrumb Component Development
+          </h1>
+        </header>
 
-      <main className="mt-5">
-        <Breadcrumb
-          mode="url"
-          // mode="custom"
-          // items={sampleItems}
-          onItemClick={handleBreadcrumbClick}
-          showHome={true}
-          homeLabel="Home"
-          // navClassName="bg-gray-100 p-2 rounded shadow"
-          // crumbClassNames="text-red-500 hover:text-red-700 transition-colors"
-          // noAnimations={true}
-          separator="chevron"
-          maxItems={10}
-          variant="default"
-          collapsible={false}
-        />
-      </main>
-    </div>
+        <main className="mt-5">
+          <Breadcrumb
+            mode="url"
+            // mode="custom"
+            // items={sampleItems}
+            onItemClick={handleBreadcrumbClick}
+            showHome={true}
+            homeLabel="Home"
+            // navClassName="bg-gray-100 p-2 rounded shadow"
+            // crumbClassNames="text-red-500 hover:text-red-700 transition-colors"
+            // noAnimations={true}
+            separator="chevron"
+            maxItems={10}
+            variant="default"
+            collapsible={false}
+          />
+        </main>
+      </div>
+    </html>
   );
 }
 

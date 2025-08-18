@@ -159,26 +159,34 @@ export const Breadcrumb: React.FC<BreadcrumbProps> = ({
         ) : null}
 
         {showHome ? (
-          <motion.div className="flex items-center">
-            <motion.a
-              className={cn(
-                "text-gray-500 hover:text-gray-900 transition-colors duration-200 overflow-auto whitespace-nowrap flex items-center justify-center dark:text-white/80 hover:dark:text-white/80",
-                variant === "pills" &&
-                  "rounded-full border dark:border-gray-600 px-3 py-1",
-                variant === "bordered" &&
-                  "rounded-sm border dark:border-gray-600 px-3 py-1"
-              )}
-              href={homeHref}
-              onClick={() => {
-                if (onItemClick) {
-                  onItemClick({ label: "Home", href: homeHref }, 0);
-                }
-              }}
-            >
-              <Home className=" size-4 dark:text-white/60 hover:dark:text-white/50" />
-              {homeLabel ? <span className="ml-1">{homeLabel}</span> : null}
-            </motion.a>
-          </motion.div>
+          <motion.a
+            className={cn(
+              "text-gray-500 hover:text-gray-900 transition-colors duration-200 overflow-auto whitespace-nowrap flex items-center justify-center dark:text-white/80 hover:dark:text-white/80",
+              variant === "pills" &&
+                "rounded-full border dark:border-gray-600 px-3 py-1",
+              variant === "bordered" &&
+                "rounded-sm border dark:border-gray-600 px-3 py-1"
+            )}
+            href={homeHref}
+            onClick={() => {
+              if (onItemClick) {
+                onItemClick({ label: "Home", href: homeHref }, 0);
+              }
+            }}
+          >
+            <Home className=" size-4 dark:text-white/60 hover:dark:text-white/50" />
+            {homeLabel ? <span className="ml-1">{homeLabel}</span> : null}
+          </motion.a>
+        ) : null}
+
+        {/* Home separator - only show if home is visible and there are visible items */}
+        {showHome && visibleItems.length > 0 && variant === "default" ? (
+          <div className="flex items-center justify-center h-full text-gray-400 size-4">
+            {separator === "chevron" && <ChevronRight />}
+            {separator === "slash" && <span>/</span>}
+            {separator === "line" && <LineSeparator />}
+            {separator === "custom" && customSeparator}
+          </div>
         ) : null}
 
         {!collapsed && hiddenItems.length > 0 && (
