@@ -288,7 +288,8 @@ export const Breadcrumb: React.FC<BreadcrumbProps> = ({
             return (
               <motion.div
                 key={index}
-                className={cn("flex items-center gap-1")}
+                w
+                className={cn("flex items-center", index !== 0 && "gap-1")}
                 variants={shouldDisableAnimations ? undefined : childVariants}
               >
                 <div>
