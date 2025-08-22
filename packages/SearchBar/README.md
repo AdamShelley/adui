@@ -4,16 +4,10 @@ A customizable React search bar component with advanced features, animations, an
 
 ## Features
 
-- 🔍 Animated search interface with minimizable option
-- 📋 Dropdown suggestions with keyboard navigation
-- ⌨️ Keyboard accessible (arrow keys, enter, escape)
-- 🎨 Customizable styling and appearance
-- 💬 Highlight matched text in suggestions
-- ⏱️ Debounced input for performance
-- 🧩 Custom rendering of suggestion items
-- ♿ Accessible with ARIA attributes
-- 🌓 Dark mode support with system preference detection
-- 📏 Standardized dimensions for consistent UI
+- Animated search interface with dropdown suggestions and keyboard navigation
+- Debounced input with customizable filtering and match highlighting
+- Minimizable design with optional clear button functionality
+- Full accessibility support with ARIA attributes and keyboard controls
 
 ## Installation
 
@@ -107,7 +101,3 @@ const AdvancedSearch = () => {
 | `width`                  | `string`                                                 | `"400px"`            | Width of the search bar                                 |
 | `height`                 | `string`                                                 | `"48px"`             | Height of the search bar                                |
 | `darkMode`               | `boolean`                                                | `undefined`          | Force dark mode (true/false) or auto-detect (undefined) |
-
-## License
-
-MIT © [Adam Shelley](https://github.com/yourusername)
