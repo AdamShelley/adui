@@ -1,10 +1,11 @@
 import { defineConfig } from "vite";
+import tailwindcss from "@tailwindcss/vite";
 import react from "@vitejs/plugin-react";
 
 export default defineConfig(({ command }) => {
   if (command === "build") {
     return {
-      plugins: [react()],
+      plugins: [react(), tailwindcss()],
       build: {
         outDir: "dist",
         lib: {
@@ -17,7 +18,7 @@ export default defineConfig(({ command }) => {
     };
   }
   return {
-    plugins: [react()],
+    plugins: [react(), tailwindcss()],
     server: {
       open: true,
     },
