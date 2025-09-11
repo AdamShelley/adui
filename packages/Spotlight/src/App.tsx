@@ -18,6 +18,7 @@ function TestComponent() {
 
   const spotlightWithButton = useSpotlightTarget({
     highlightOnHover: true,
+    dontDisappear: true,
     addedComponent: (
       <div>
         <h4 className="font-semibold text-gray-900 dark:text-white mb-2">

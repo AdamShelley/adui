@@ -75,12 +75,12 @@ export function SpotlightProvider({ children }: SpotlightProviderProps) {
             className="pointer-events-none fixed inset-0 z-50"
             style={{
               background: `radial-gradient(circle ${
-                Math.max(elementRect.width, elementRect.height) / 2 + 40
+                Math.max(elementRect.width, elementRect.height) / 2 + 20
               }px at ${
                 elementRect.left + elementRect.width / 2 + window.scrollX
               }px ${
                 elementRect.top + elementRect.height / 2 + window.scrollY
-              }px, transparent 0%, transparent 40%, rgba(0, 0, 0, 0.8) 70%)`,
+              }px, transparent 100%, transparent 40%, rgba(0, 0, 0, 0.8) 70%)`,
             }}
           />
           {/* Blur layer - only outside spotlight */}
@@ -133,6 +133,7 @@ export function SpotlightProvider({ children }: SpotlightProviderProps) {
 interface UseSpotlightTargetConfig {
   highlightOnHover?: boolean;
   addedComponent?: React.ReactElement;
+  dontDisappear?: boolean;
 }
 
 export function useSpotlightTarget(config: UseSpotlightTargetConfig = {}) {
@@ -156,7 +157,10 @@ export function useSpotlightTarget(config: UseSpotlightTargetConfig = {}) {
   useEffect(() => {
     if (element && config.highlightOnHover) {
       element.addEventListener("mouseenter", highlight);
-      element.addEventListener("mouseleave", stopHighlight);
+
+      if (!config.dontDisappear) {
+        element.addEventListener("mouseleave", stopHighlight);
+      }
 
       return () => {
         element.removeEventListener("mouseenter", highlight);
