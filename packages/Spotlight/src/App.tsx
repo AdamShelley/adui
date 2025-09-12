@@ -27,7 +27,10 @@ function TestComponent() {
         <p className="text-gray-600 dark:text-gray-300 mb-3">
           You can even add interactive elements!
         </p>
-        <button className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-sm">
+        <button
+          className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-sm"
+          onClick={() => alert("Hi!")}
+        >
           Click me!
         </button>
       </div>
@@ -56,7 +59,12 @@ function TestComponent() {
 export default function App() {
   return (
     <div className="dark:bg-gray-950 w-screen h-screen">
-      <SpotlightProvider>
+      <SpotlightProvider
+        blurIntensity={1}
+        overlayOpacity={0.2}
+        spotlightPadding={50}
+        blurPadding={20}
+      >
         <TestComponent />
       </SpotlightProvider>
     </div>
@@ -64,7 +72,6 @@ export default function App() {
 }
 
 // todo:
-// Add ability to add text under it
 // Different styles / shapes
 // Opacity/ no opacity
 // Multiple refs passed in for same affect e.g. in the list above without new hooks every time?

@@ -15,11 +15,21 @@ const SpotlightContext = createContext({
   isActive: false,
 });
 
-interface SpotlightProviderProps {
+export interface SpotlightProviderProps {
   children: React.ReactNode;
+  blurIntensity?: number; // in pixels, default 2px
+  overlayOpacity?: number; // 0-1, default 0.8
+  spotlightPadding?: number; // extra padding around spotlight area, default 20px
+  blurPadding?: number; // extra padding for blur mask, default 40px
 }
 
-export function SpotlightProvider({ children }: SpotlightProviderProps) {
+export function SpotlightProvider({
+  children,
+  blurIntensity = 2,
+  overlayOpacity = 0.8,
+  spotlightPadding = 20,
+  blurPadding = 40,
+}: SpotlightProviderProps) {
   const [activeElement, setActiveElement] = useState<HTMLElement | null>(null);
   const [isActive, setIsActive] = useState(false);
   const [elementRect, setElementRect] = useState<DOMRect | null>(null);
@@ -75,21 +85,23 @@ export function SpotlightProvider({ children }: SpotlightProviderProps) {
             className="pointer-events-none fixed inset-0 z-50"
             style={{
               background: `radial-gradient(circle ${
-                Math.max(elementRect.width, elementRect.height) / 2 + 20
+                Math.max(elementRect.width, elementRect.height) / 2 +
+                spotlightPadding
               }px at ${
                 elementRect.left + elementRect.width / 2 + window.scrollX
               }px ${
                 elementRect.top + elementRect.height / 2 + window.scrollY
-              }px, transparent 100%, transparent 40%, rgba(0, 0, 0, 0.8) 70%)`,
+              }px, transparent 50%, transparent 40%, rgba(0, 0, 0, ${overlayOpacity}) 70%)`,
             }}
           />
           {/* Blur layer - only outside spotlight */}
           <div
             className="pointer-events-none fixed inset-0 z-50"
             style={{
-              backdropFilter: "blur(2px)",
+              backdropFilter: `blur(${blurIntensity}px)`,
               mask: `radial-gradient(circle ${
-                Math.max(elementRect.width, elementRect.height) / 2 + 40
+                Math.max(elementRect.width, elementRect.height) / 2 +
+                blurPadding
               }px at ${
                 elementRect.left + elementRect.width / 2 + window.scrollX
               }px ${
@@ -115,8 +127,8 @@ export function SpotlightProvider({ children }: SpotlightProviderProps) {
               className="absolute z-[60] pointer-events-auto"
               style={{
                 left: elementRect.left + elementRect.width / 2 + window.scrollX,
-                top: elementRect.bottom + window.scrollY + 20, // 20px below the element
-                transform: "translateX(-50%)", // Center horizontally
+                top: elementRect.bottom + window.scrollY + 150,
+                transform: "translateX(-50%)",
               }}
             >
               <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 p-4 max-w-sm">
