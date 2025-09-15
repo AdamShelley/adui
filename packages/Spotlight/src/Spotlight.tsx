@@ -5,6 +5,7 @@ import {
   useEffect,
   useState,
 } from "react";
+import { cn } from "../utils/cn";
 
 const SpotlightContext = createContext({
   highlightElement: (
@@ -21,14 +22,24 @@ export interface SpotlightProviderProps {
   overlayOpacity?: number; // 0-1, default 0.8
   spotlightPadding?: number; // extra padding around spotlight area, default 20px
   blurPadding?: number; // extra padding for blur mask, default 40px
+  className?: string; // additional styles for the provider
+  overlayClassName?: string; // styles for the overlay
+  blurClassName?: string; // styles for the blur layer
+  borderClassName?: string; // styles for the spotlight border
+  tooltipClassName?: string; // styles for the tooltip container
 }
 
 export function SpotlightProvider({
   children,
   blurIntensity = 2,
-  overlayOpacity = 0.8,
-  spotlightPadding = 20,
-  blurPadding = 40,
+  overlayOpacity = 0.9,
+  spotlightPadding = 100,
+  blurPadding = 80,
+  className,
+  overlayClassName,
+  blurClassName,
+  borderClassName,
+  tooltipClassName,
 }: SpotlightProviderProps) {
   const [activeElement, setActiveElement] = useState<HTMLElement | null>(null);
   const [isActive, setIsActive] = useState(false);
@@ -82,7 +93,10 @@ export function SpotlightProvider({
         <>
           {/* Dark overlay with blur - only outside spotlight */}
           <div
-            className="pointer-events-none fixed inset-0 z-50"
+            className={cn(
+              "pointer-events-none fixed inset-0 z-50",
+              overlayClassName
+            )}
             style={{
               background: `radial-gradient(circle ${
                 Math.max(elementRect.width, elementRect.height) / 2 +
@@ -96,7 +110,10 @@ export function SpotlightProvider({
           />
           {/* Blur layer - only outside spotlight */}
           <div
-            className="pointer-events-none fixed inset-0 z-50"
+            className={cn(
+              "pointer-events-none fixed inset-0 z-50",
+              blurClassName
+            )}
             style={{
               backdropFilter: `blur(${blurIntensity}px)`,
               mask: `radial-gradient(circle ${
@@ -111,7 +128,10 @@ export function SpotlightProvider({
           />
 
           <div
-            className="absolute border-4 border-white/50 rounded-full animate-pulse pointer-events-none z-50"
+            className={cn(
+              "absolute border-4 border-white/50 rounded-full animate-pulse pointer-events-none z-50",
+              borderClassName
+            )}
             style={{
               left: elementRect.left + elementRect.width / 2 + window.scrollX,
               top: elementRect.top + elementRect.height / 2 + window.scrollY,
@@ -124,14 +144,19 @@ export function SpotlightProvider({
           {/* Custom component tooltip */}
           {activeComponent && (
             <div
-              className="absolute z-[60] pointer-events-auto"
+              className={cn("absolute z-[60] pointer-events-auto", className)}
               style={{
                 left: elementRect.left + elementRect.width / 2 + window.scrollX,
                 top: elementRect.bottom + window.scrollY + 150,
                 transform: "translateX(-50%)",
               }}
             >
-              <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 p-4 max-w-sm">
+              <div
+                className={cn(
+                  "bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 p-4 max-w-sm",
+                  tooltipClassName
+                )}
+              >
                 {activeComponent}
               </div>
             </div>
