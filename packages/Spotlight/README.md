@@ -1,50 +1,112 @@
-# Spotlight
+# Spotlight Component
 
-A customizable spotlight component that highlights specific elements with blur and overlay effects.
+A React component that creates a spotlight effect to highlight specific elements on your page, with customizable visibility for content outside the spotlight.
 
-## Usage
+## Installation
+
+```bash
+npm install @adamui/spotlight
+```
+
+## Basic Usage
 
 ```tsx
 import { SpotlightProvider, useSpotlightTarget } from "@adamui/spotlight";
 
-function App() {
+function MyComponent() {
+  const spotlight = useSpotlightTarget({
+    highlightOnHover: true,
+    addedComponent: (
+      <div>
+        <h3>Tooltip Title</h3>
+        <p>This appears when you hover over the element.</p>
+      </div>
+    ),
+  });
+
   return (
-    <SpotlightProvider
-      blurIntensity={1} // Blur intensity in pixels (default: 2)
-      overlayOpacity={0.4} // Overlay darkness 0-1 (default: 0.8)
-      spotlightPadding={30} // Extra padding around spotlight (default: 20)
-      blurPadding={50} // Extra padding for blur mask (default: 40)
-    >
-      <YourContent />
+    <SpotlightProvider>
+      <div ref={spotlight.ref}>Hover me for a spotlight effect!</div>
     </SpotlightProvider>
   );
 }
-
-function YourContent() {
-  const spotlight = useSpotlightTarget({
-    highlightOnHover: true,
-    addedComponent: <div>Custom tooltip content</div>,
-  });
-
-  return <div ref={spotlight.ref}>Hover me for spotlight effect!</div>;
-}
 ```
+
+## Controlling Outside Visibility
+
+The key feature is the `outsideOpacity` prop that controls how visible content outside the spotlight should be:
+
+```tsx
+<SpotlightProvider
+  outsideOpacity={0.1} // 10% visibility (very dark outside)
+  blurIntensity={4} // Optional: add blur effect
+  spotlightPadding={30} // Optional: adjust spotlight size
+>
+  {/* Your content */}
+</SpotlightProvider>
+```
+
+### outsideOpacity Examples:
+
+- `0` - Complete blackout outside spotlight
+- `0.2` - 20% visibility (dramatic effect)
+- `0.5` - 50% visibility (moderate dimming)
+- `0.8` - 80% visibility (subtle effect)
+- `1` - No dimming (spotlight border only)
 
 ## Props
 
 ### SpotlightProvider
 
-| Prop               | Type     | Default | Description                                  |
-| ------------------ | -------- | ------- | -------------------------------------------- |
-| `blurIntensity`    | `number` | `2`     | Blur intensity in pixels for background      |
-| `overlayOpacity`   | `number` | `0.8`   | Opacity of dark overlay (0-1)                |
-| `spotlightPadding` | `number` | `20`    | Extra padding around the highlighted element |
-| `blurPadding`      | `number` | `40`    | Extra padding for the blur mask effect       |
+| Prop               | Type     | Default | Description                                            |
+| ------------------ | -------- | ------- | ------------------------------------------------------ |
+| `outsideOpacity`   | `number` | `0.3`   | How visible content outside spotlight should be (0-1)  |
+| `blurIntensity`    | `number` | `2`     | Blur intensity in pixels for content outside spotlight |
+| `spotlightPadding` | `number` | `20`    | Extra padding around the highlighted element           |
+| `overlayOpacity`   | `number` | `0.8`   | Base overlay opacity (used internally)                 |
 
 ### useSpotlightTarget
 
-| Option             | Type           | Default     | Description                              |
-| ------------------ | -------------- | ----------- | ---------------------------------------- |
-| `highlightOnHover` | `boolean`      | `false`     | Automatically highlight on hover         |
-| `addedComponent`   | `ReactElement` | `undefined` | Custom component to show as tooltip      |
-| `dontDisappear`    | `boolean`      | `false`     | Keep spotlight active after mouse leaves |
+| Prop               | Type           | Default | Description                      |
+| ------------------ | -------------- | ------- | -------------------------------- |
+| `highlightOnHover` | `boolean`      | `false` | Auto-highlight when hovering     |
+| `addedComponent`   | `ReactElement` | -       | Custom tooltip to show           |
+| `dontDisappear`    | `boolean`      | `false` | Keep spotlight when mouse leaves |
+
+## Complete Example
+
+```tsx
+import { SpotlightProvider, useSpotlightTarget } from "@adamui/spotlight";
+
+function App() {
+  const spotlight = useSpotlightTarget({
+    highlightOnHover: true,
+    addedComponent: (
+      <div>
+        <h3>Welcome!</h3>
+        <p>This element is highlighted with customizable outside visibility.</p>
+      </div>
+    ),
+  });
+
+  return (
+    <SpotlightProvider
+      outsideOpacity={0.2} // 20% visibility outside spotlight
+      blurIntensity={6} // 6px blur effect
+      spotlightPadding={40} // Extra space around element
+    >
+      <div className="p-20">
+        <h1>My App</h1>
+        <p ref={spotlight.ref} className="cursor-pointer">
+          Hover me to see the spotlight effect!
+        </p>
+        <p>This content will be dimmed when spotlight is active.</p>
+      </div>
+    </SpotlightProvider>
+  );
+}
+```
+
+## License
+
+MIT

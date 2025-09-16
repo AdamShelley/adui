@@ -19,9 +19,8 @@ const SpotlightContext = createContext({
 export interface SpotlightProviderProps {
   children: React.ReactNode;
   blurIntensity?: number; // in pixels, default 2px
-  overlayOpacity?: number; // 0-1, default 0.8
+  outsideOpacity?: number; // 0-1, how visible content outside spotlight should be, default 0.3
   spotlightPadding?: number; // extra padding around spotlight area, default 20px
-  blurPadding?: number; // extra padding for blur mask, default 40px
   className?: string; // additional styles for the provider
   overlayClassName?: string; // styles for the overlay
   blurClassName?: string; // styles for the blur layer
@@ -32,9 +31,8 @@ export interface SpotlightProviderProps {
 export function SpotlightProvider({
   children,
   blurIntensity = 2,
-  overlayOpacity = 0.9,
-  spotlightPadding = 100,
-  blurPadding = 80,
+  outsideOpacity = 0.3,
+  spotlightPadding = 20,
   className,
   overlayClassName,
   blurClassName,
@@ -91,7 +89,7 @@ export function SpotlightProvider({
       {/* Spotlight overlay */}
       {isActive && elementRect && (
         <>
-          {/* Dark overlay with blur - only outside spotlight */}
+          {/* Dark overlay - controls how visible content outside spotlight is */}
           <div
             className={cn(
               "pointer-events-none fixed inset-0 z-50",
@@ -105,9 +103,12 @@ export function SpotlightProvider({
                 elementRect.left + elementRect.width / 2 + window.scrollX
               }px ${
                 elementRect.top + elementRect.height / 2 + window.scrollY
-              }px, transparent 50%, transparent 40%, rgba(0, 0, 0, ${overlayOpacity}) 70%)`,
+              }px, transparent 30%, transparent 40%, rgba(0, 0, 0, ${
+                1 - outsideOpacity
+              }) 70%)`,
             }}
           />
+
           {/* Blur layer - only outside spotlight */}
           <div
             className={cn(
@@ -118,7 +119,8 @@ export function SpotlightProvider({
               backdropFilter: `blur(${blurIntensity}px)`,
               mask: `radial-gradient(circle ${
                 Math.max(elementRect.width, elementRect.height) / 2 +
-                blurPadding
+                spotlightPadding +
+                80
               }px at ${
                 elementRect.left + elementRect.width / 2 + window.scrollX
               }px ${
