@@ -7,6 +7,8 @@ import {
 } from "react";
 import { cn } from "../utils/cn";
 
+import { motion } from "framer-motion";
+
 const SpotlightContext = createContext({
   highlightElement: (
     _element: HTMLElement,
@@ -129,9 +131,11 @@ export function SpotlightProvider({
             }}
           />
 
-          <div
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1, transition: { duration: 0.3 } }}
             className={cn(
-              "absolute border-4 border-white/50 rounded-full animate-pulse pointer-events-none z-50",
+              "absolute border-4 border-white/50 rounded-full pointer-events-none z-50",
               borderClassName
             )}
             style={{

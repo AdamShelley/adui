@@ -161,6 +161,7 @@ export default function App() {
         outsideOpacity={0.95}
         blurIntensity={2}
         spotlightPadding={0}
+        spotlightShape="circle"
       >
         <div className="absolute top-4 right-4 z-10">
           <button
