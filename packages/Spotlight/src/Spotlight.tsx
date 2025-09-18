@@ -18,6 +18,8 @@ const SpotlightContext = createContext({
   isActive: false,
 });
 
+// Provider
+
 export interface SpotlightProviderProps {
   children: React.ReactNode;
   blurIntensity?: number; // in pixels, default 2px
@@ -28,6 +30,7 @@ export interface SpotlightProviderProps {
   blurClassName?: string; // styles for the blur layer
   borderClassName?: string; // styles for the spotlight border
   tooltipClassName?: string; // styles for the tooltip container
+  spotlightShape?: string;
 }
 
 export function SpotlightProvider({
@@ -40,6 +43,7 @@ export function SpotlightProvider({
   blurClassName,
   borderClassName,
   tooltipClassName,
+  spotlightShape = "circle",
 }: SpotlightProviderProps) {
   const [activeElement, setActiveElement] = useState<HTMLElement | null>(null);
   const [isActive, setIsActive] = useState(false);
@@ -172,6 +176,8 @@ export function SpotlightProvider({
     </SpotlightContext.Provider>
   );
 }
+
+// Hook
 
 interface UseSpotlightTargetConfig {
   highlightOnHover?: boolean;
