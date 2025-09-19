@@ -9,6 +9,8 @@ export default function App() {
         blurIntensity={5}
         spotlightPadding={50}
         spotlightShape="circle"
+        zoom={1.5}
+        wiggleIntensity={3}
       >
         <TestComponent />
       </SpotlightProvider>
