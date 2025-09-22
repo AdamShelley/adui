@@ -12,9 +12,11 @@ export interface SpotlightTargetConfig {
 export interface SpotlightContextValue {
   highlightElement: (
     element: HTMLElement,
-    component?: React.ReactElement
+    component?: React.ReactElement,
+    isPersistent?: boolean
   ) => void;
   clearSpotlight: () => void;
+  clearSpotlightFromElement: (element: HTMLElement) => void;
   isActive: boolean;
 }
 

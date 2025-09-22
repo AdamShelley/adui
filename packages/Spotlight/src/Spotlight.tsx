@@ -13,9 +13,11 @@ import { motion } from "framer-motion";
 const SpotlightContext = createContext({
   highlightElement: (
     _element: HTMLElement,
-    _component?: React.ReactElement
+    _component?: React.ReactElement,
+    _isPersistent?: boolean
   ) => {},
   clearSpotlight: () => {},
+  clearSpotlightFromElement: (_element: HTMLElement) => {},
   isActive: false,
 });
 
@@ -31,8 +33,6 @@ export interface SpotlightProviderProps {
   blurClassName?: string; // styles for the blur layer
   borderClassName?: string; // styles for the spotlight border
   tooltipClassName?: string; // styles for the tooltip container
-  zoom?: number; // zoom factor for content inside spotlight, default 1 (no zoom), > 1 zooms in
-  wiggleIntensity?: number; // intensity of mouse wiggle effect when zooming, default 3px
   spotlightShape?: SpotlightShape;
 }
 
@@ -48,8 +48,6 @@ export function SpotlightProvider({
   blurClassName,
   borderClassName,
   tooltipClassName,
-  zoom = 1,
-  wiggleIntensity = 3,
   spotlightShape = "circle",
 }: SpotlightProviderProps) {
   const [activeElement, setActiveElement] = useState<HTMLElement | null>(null);
@@ -57,80 +55,46 @@ export function SpotlightProvider({
   const [elementRect, setElementRect] = useState<DOMRect | null>(null);
   const [activeComponent, setActiveComponent] =
     useState<React.ReactElement | null>(null);
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  const [isPersistent, setIsPersistent] = useState(false);
 
   const highlightElement = useCallback(
-    (element: HTMLElement, component?: React.ReactElement) => {
+    (
+      element: HTMLElement,
+      component?: React.ReactElement,
+      persistent?: boolean
+    ) => {
+      // Don't allow new spotlights to override a persistent one
+      if (isActive && isPersistent && !persistent) {
+        return;
+      }
+
       const rect = element.getBoundingClientRect();
       setElementRect(rect);
       setActiveElement(element);
       setActiveComponent(component || null);
+      setIsPersistent(persistent || false);
       setIsActive(true);
     },
-    []
+    [isActive, isPersistent]
   );
 
   const clearSpotlight = useCallback(() => {
     setActiveElement(null);
     setElementRect(null);
     setActiveComponent(null);
+    setIsPersistent(false);
     setIsActive(false);
-    
-    // Delay restoring overflow to let zoom animation complete
-    if (zoom !== 1) {
-      setTimeout(() => {
-        document.body.style.overflow = "";
-      }, 300); // Match the transform transition duration
-    }
-  }, [zoom]);
+  }, []);
 
-  // Prevent scrolling when spotlight is active with zoom
-  useEffect(() => {
-    if (isActive && zoom !== 1) {
-      document.body.style.overflow = "hidden";
-    } else if (!isActive) {
-      // Only restore overflow if spotlight is not active
-      document.body.style.overflow = "";
-    }
-  }, [isActive, zoom]);
-
-  // Mouse tracking for wiggle effect when zooming
-  useEffect(() => {
-    if (isActive && zoom !== 1) {
-      const handleMouseMove = (e: MouseEvent) => {
-        setMousePosition({ x: e.clientX, y: e.clientY });
-      };
-
-      window.addEventListener("mousemove", handleMouseMove);
-      return () => {
-        window.removeEventListener("mousemove", handleMouseMove);
-      };
-    }
-  }, [isActive, zoom]);
-
-  // Calculate wiggle offset based on mouse position
-  const getWiggleOffset = () => {
-    if (!isActive || zoom === 1 || !elementRect) return { x: 0, y: 0 };
-
-    const centerX = window.innerWidth / 2;
-    const centerY = window.innerHeight / 2;
-
-    // Calculate how far mouse is from center (normalized to -1 to 1)
-    const offsetX = (mousePosition.x - centerX) / centerX;
-    const offsetY = (mousePosition.y - centerY) / centerY;
-
-    // Clamp the values to prevent extreme movements
-    const clampedX = Math.max(-1, Math.min(1, offsetX));
-    const clampedY = Math.max(-1, Math.min(1, offsetY));
-
-    // Apply wiggle intensity (inverted so mouse bottom-left moves content up-right)
-    return {
-      x: -clampedX * wiggleIntensity,
-      y: -clampedY * wiggleIntensity,
-    };
-  };
-
-  const wiggleOffset = getWiggleOffset();
+  const clearSpotlightFromElement = useCallback(
+    (element: HTMLElement) => {
+      // Only clear if this element is the currently active one
+      if (activeElement === element) {
+        clearSpotlight();
+      }
+    },
+    [activeElement, clearSpotlight]
+  );
 
   useEffect(() => {
     if (activeElement && isActive) {
@@ -152,26 +116,14 @@ export function SpotlightProvider({
 
   return (
     <SpotlightContext.Provider
-      value={{ highlightElement, clearSpotlight, isActive }}
+      value={{
+        highlightElement,
+        clearSpotlight,
+        clearSpotlightFromElement,
+        isActive,
+      }}
     >
-      <div
-        style={{
-          transform: isActive && zoom !== 1 
-            ? `scale(${zoom}) translate(${wiggleOffset.x}px, ${wiggleOffset.y}px)` 
-            : "scale(1)",
-          transformOrigin:
-            isActive && elementRect
-              ? `${elementRect.left + elementRect.width / 2}px ${
-                  elementRect.top + elementRect.height / 2
-                }px`
-              : "center",
-          transition: isActive && zoom !== 1 
-            ? "transform 0.1s ease-out" 
-            : "transform 0.3s ease-in-out",
-        }}
-      >
-        {children}
-      </div>
+      {children}
       {/* Spotlight overlay */}
       {isActive && elementRect && (
         <>
@@ -267,7 +219,8 @@ interface UseSpotlightTargetConfig {
 
 export function useSpotlightTarget(config: UseSpotlightTargetConfig = {}) {
   const [element, setElement] = useState<HTMLElement | null>(null);
-  const { highlightElement, clearSpotlight } = useContext(SpotlightContext);
+  const { highlightElement, clearSpotlightFromElement } =
+    useContext(SpotlightContext);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const highlight = useCallback(() => {
@@ -277,20 +230,20 @@ export function useSpotlightTarget(config: UseSpotlightTargetConfig = {}) {
         clearTimeout(timeoutRef.current);
         timeoutRef.current = null;
       }
-      highlightElement(element, config.addedComponent);
+      highlightElement(element, config.addedComponent, config.dontDisappear);
     }
-  }, [highlightElement, element, config.addedComponent]);
+  }, [highlightElement, element, config.addedComponent, config.dontDisappear]);
 
   const stopHighlight = useCallback(() => {
     // Add a small delay to prevent rapid on/off cycling
-    if (!config.dontDisappear) {
+    if (!config.dontDisappear && element) {
       timeoutRef.current = setTimeout(() => {
-        clearSpotlight();
+        clearSpotlightFromElement(element);
       }, 100); // 100ms delay
-    } else {
-      clearSpotlight();
+    } else if (element) {
+      clearSpotlightFromElement(element);
     }
-  }, [clearSpotlight, config.dontDisappear]);
+  }, [clearSpotlightFromElement, config.dontDisappear, element]);
 
   const ref = useCallback((node: HTMLElement | null) => {
     setElement(node);
@@ -313,7 +266,13 @@ export function useSpotlightTarget(config: UseSpotlightTargetConfig = {}) {
         }
       };
     }
-  }, [element, highlight, stopHighlight, config.highlightOnHover, config.dontDisappear]);
+  }, [
+    element,
+    highlight,
+    stopHighlight,
+    config.highlightOnHover,
+    config.dontDisappear,
+  ]);
 
   return {
     ref,
