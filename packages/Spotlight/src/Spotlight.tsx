@@ -21,6 +21,8 @@ const SpotlightContext = createContext({
   isActive: false,
 });
 
+export { SpotlightContext };
+
 // Provider
 
 export interface SpotlightProviderProps {
@@ -235,13 +237,22 @@ export function useSpotlightTarget(config: UseSpotlightTargetConfig = {}) {
   }, [highlightElement, element, config.addedComponent, config.dontDisappear]);
 
   const stopHighlight = useCallback(() => {
-    // Add a small delay to prevent rapid on/off cycling
-    if (!config.dontDisappear && element) {
-      timeoutRef.current = setTimeout(() => {
+    if (element) {
+      // Clear any pending timeout first
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+        timeoutRef.current = null;
+      }
+
+      // For persistent spotlights (dontDisappear: true), clear immediately
+      // For non-persistent, add a small delay to prevent rapid on/off cycling
+      if (config.dontDisappear) {
         clearSpotlightFromElement(element);
-      }, 100); // 100ms delay
-    } else if (element) {
-      clearSpotlightFromElement(element);
+      } else {
+        timeoutRef.current = setTimeout(() => {
+          clearSpotlightFromElement(element);
+        }, 100); // 100ms delay
+      }
     }
   }, [clearSpotlightFromElement, config.dontDisappear, element]);
 

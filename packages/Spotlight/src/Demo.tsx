@@ -1,4 +1,6 @@
 import { useSpotlightTarget } from "./Spotlight";
+import { useContext } from "react";
+import { SpotlightContext } from "./Spotlight";
 
 export function TestComponent() {
   const spotlight = useSpotlightTarget({
@@ -16,9 +18,8 @@ export function TestComponent() {
     ),
   });
 
-  const stopHighlight = () => {
-    spotlightWithButton.stopHighlight();
-  };
+  // Get the clearSpotlight function from context for more reliable clearing
+  const { clearSpotlight } = useContext(SpotlightContext);
 
   const spotlightWithButton = useSpotlightTarget({
     highlightOnHover: true,
@@ -33,7 +34,12 @@ export function TestComponent() {
         </p>
         <button
           className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-sm"
-          onClick={stopHighlight}
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            // Use the direct clearSpotlight function for more reliable clearing
+            clearSpotlight();
+          }}
         >
           Click me to exit spotlight
         </button>
