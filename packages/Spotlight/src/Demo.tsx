@@ -18,7 +18,6 @@ export function TestComponent() {
     ),
   });
 
-  // Get the clearSpotlight function from context for more reliable clearing
   const { clearSpotlight } = useContext(SpotlightContext);
 
   const spotlightWithButton = useSpotlightTarget({
@@ -34,12 +33,7 @@ export function TestComponent() {
         </p>
         <button
           className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-sm"
-          onClick={(e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            // Use the direct clearSpotlight function for more reliable clearing
-            clearSpotlight();
-          }}
+          onClick={() => clearSpotlight()}
         >
           Click me to exit spotlight
         </button>
@@ -55,6 +49,7 @@ export function TestComponent() {
         <div className="text-center">
           <p
             ref={spotlight.ref}
+            onClick={() => alert("Hi")}
             className="cursor-pointer bg-blue-600 px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors"
           >
             Standard Spotlight

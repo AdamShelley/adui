@@ -81,6 +81,8 @@ export function SpotlightProvider({
   );
 
   const clearSpotlight = useCallback(() => {
+    // TODO: Pass in event here?
+
     setActiveElement(null);
     setElementRect(null);
     setActiveComponent(null);
@@ -131,6 +133,7 @@ export function SpotlightProvider({
         <>
           {/* Dark overlay - controls how visible content outside spotlight is */}
           <div
+            onClick={(e) => e.stopPropagation()}
             className={cn(
               "pointer-events-none fixed inset-0 z-50",
               overlayClassName
@@ -151,6 +154,7 @@ export function SpotlightProvider({
 
           {/* Blur layer - only outside spotlight */}
           <div
+            onClick={(e) => e.stopPropagation()}
             className={cn(
               "pointer-events-none fixed inset-0 z-50",
               blurClassName
@@ -193,6 +197,10 @@ export function SpotlightProvider({
                 left: elementRect.left + elementRect.width / 2 + window.scrollX,
                 top: elementRect.bottom + window.scrollY + 150,
                 transform: "translateX(-50%)",
+              }}
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
               }}
             >
               <div
