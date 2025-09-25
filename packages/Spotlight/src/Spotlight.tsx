@@ -1,3 +1,5 @@
+"use client";
+
 import {
   createContext,
   useCallback,
@@ -162,14 +164,12 @@ export function SpotlightProvider({
             style={{
               backdropFilter: `blur(${blurIntensity}px)`,
               mask: `radial-gradient(circle ${
-                Math.max(elementRect.width, elementRect.height) / 2 +
-                spotlightPadding +
-                80
+                (Math.max(elementRect.width, elementRect.height) + 80) / 2
               }px at ${
                 elementRect.left + elementRect.width / 2 + window.scrollX
               }px ${
                 elementRect.top + elementRect.height / 2 + window.scrollY
-              }px, transparent 0%, transparent 40%, black 70%)`,
+              }px, transparent 0%, transparent 100%, black 100%)`,
             }}
           />
 
@@ -177,7 +177,7 @@ export function SpotlightProvider({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1, transition: { duration: 0.3 } }}
             className={cn(
-              "absolute border-4 border-white/50 rounded-full pointer-events-none z-[55]",
+              "absolute border-2 border-[#ccc] rounded-full pointer-events-none z-[55]",
               borderClassName
             )}
             style={{
@@ -259,7 +259,7 @@ export function useSpotlightTarget(config: UseSpotlightTargetConfig = {}) {
       } else {
         timeoutRef.current = setTimeout(() => {
           clearSpotlightFromElement(element);
-        }, 100); // 100ms delay
+        }, 100);
       }
     }
   }, [clearSpotlightFromElement, config.dontDisappear, element]);

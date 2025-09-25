@@ -5,8 +5,8 @@ export default function App() {
   return (
     <div className="dark:bg-gray-950 w-screen h-screen">
       <SpotlightProvider
-        outsideOpacity={0.5}
-        blurIntensity={5}
+        outsideOpacity={1}
+        blurIntensity={10}
         spotlightPadding={50}
         spotlightShape="circle"
       >
