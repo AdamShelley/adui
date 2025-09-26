@@ -38,6 +38,7 @@ export interface SpotlightProviderProps {
   borderClassName?: string; // styles for the spotlight border
   tooltipClassName?: string; // styles for the tooltip container
   spotlightShape?: SpotlightShape;
+  blockInteractions?: boolean; // whether to block interactions with elements outside spotlight, default true
 }
 
 type SpotlightShape = "circle" | "square";
@@ -53,6 +54,7 @@ export function SpotlightProvider({
   borderClassName,
   tooltipClassName,
   spotlightShape = "circle",
+  blockInteractions = true,
 }: SpotlightProviderProps) {
   const [activeElement, setActiveElement] = useState<HTMLElement | null>(null);
   const [isActive, setIsActive] = useState(false);
@@ -78,19 +80,32 @@ export function SpotlightProvider({
       setActiveComponent(component || null);
       setIsPersistent(persistent || false);
       setIsActive(true);
+
+      // Ensure the highlighted element is above the blocking overlay
+      element.style.position = element.style.position || "relative";
+      element.style.zIndex = "46";
     },
     [isActive, isPersistent]
   );
 
   const clearSpotlight = useCallback(() => {
-    // TODO: Pass in event here?
+    // Reset z-index on the previously active element
+    if (activeElement) {
+      activeElement.style.zIndex = "";
+      if (
+        activeElement.style.position === "relative" &&
+        !activeElement.style.cssText.includes("position")
+      ) {
+        activeElement.style.position = "";
+      }
+    }
 
     setActiveElement(null);
     setElementRect(null);
     setActiveComponent(null);
     setIsPersistent(false);
     setIsActive(false);
-  }, []);
+  }, [activeElement]);
 
   const clearSpotlightFromElement = useCallback(
     (element: HTMLElement) => {
@@ -133,6 +148,44 @@ export function SpotlightProvider({
       {/* Spotlight overlay */}
       {isActive && elementRect && (
         <>
+          {/* Blocking overlay - prevents interaction with all elements except spotlit one */}
+          {blockInteractions && (
+            <div
+              className="fixed inset-0 z-[45]"
+              style={{
+                pointerEvents: "auto",
+                clipPath: `polygon(
+                  0% 0%, 
+                  0% 100%, 
+                  ${elementRect.left - spotlightPadding}px 100%, 
+                  ${elementRect.left - spotlightPadding}px ${
+                  elementRect.top - spotlightPadding
+                }px, 
+                  ${elementRect.right + spotlightPadding}px ${
+                  elementRect.top - spotlightPadding
+                }px, 
+                  ${elementRect.right + spotlightPadding}px ${
+                  elementRect.bottom + spotlightPadding
+                }px, 
+                  ${elementRect.left - spotlightPadding}px ${
+                  elementRect.bottom + spotlightPadding
+                }px, 
+                  ${elementRect.left - spotlightPadding}px 100%, 
+                  100% 100%, 
+                  100% 0%
+                )`,
+              }}
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                // Optionally clear spotlight when clicking outside
+                if (!isPersistent) {
+                  clearSpotlight();
+                }
+              }}
+            />
+          )}
+
           {/* Dark overlay - controls how visible content outside spotlight is */}
           <div
             onClick={(e) => e.stopPropagation()}
