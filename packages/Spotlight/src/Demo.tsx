@@ -2,43 +2,50 @@ import { useSpotlightTarget } from "./Spotlight";
 import { useContext } from "react";
 import { SpotlightContext } from "./Spotlight";
 
+const SimpleTooltip = () => {
+  return (
+    <div>
+      <h3 className="font-bold text-gray-900 dark:text-white mb-2">
+        Welcome to Spotlight!
+      </h3>
+      <p className="text-gray-600 dark:text-gray-300">
+        This is a custom tooltip that appears when you hover over this element.
+      </p>
+    </div>
+  );
+};
+
+const InteractiveSpotlight = () => {
+  const { clearSpotlight } = useContext(SpotlightContext);
+
+  return (
+    <div>
+      <h4 className="font-semibold text-gray-900 dark:text-white mb-2">
+        Interactive Tooltip
+      </h4>
+      <p className="text-gray-600 dark:text-gray-300 mb-3">
+        You can even add interactive elements!
+      </p>
+      <button
+        className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-sm"
+        onClick={() => clearSpotlight()}
+      >
+        Click me to exit spotlight
+      </button>
+    </div>
+  );
+};
+
 export function TestComponent() {
   const spotlight = useSpotlightTarget({
     highlightOnHover: true,
-    addedComponent: (
-      <div>
-        <h3 className="font-bold text-gray-900 dark:text-white mb-2">
-          Welcome to Spotlight!
-        </h3>
-        <p className="text-gray-600 dark:text-gray-300">
-          This is a custom tooltip that appears when you hover over this
-          element.
-        </p>
-      </div>
-    ),
+    addedComponent: <SimpleTooltip />,
   });
-
-  const { clearSpotlight } = useContext(SpotlightContext);
 
   const spotlightWithButton = useSpotlightTarget({
     highlightOnHover: true,
     dontDisappear: true,
-    addedComponent: (
-      <div>
-        <h4 className="font-semibold text-gray-900 dark:text-white mb-2">
-          Interactive Tooltip
-        </h4>
-        <p className="text-gray-600 dark:text-gray-300 mb-3">
-          You can even add interactive elements!
-        </p>
-        <button
-          className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-sm"
-          onClick={() => clearSpotlight()}
-        >
-          Click me to exit spotlight
-        </button>
-      </div>
-    ),
+    addedComponent: <InteractiveSpotlight />,
   });
 
   return (

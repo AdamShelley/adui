@@ -10,7 +10,7 @@ import {
 } from "react";
 import { cn } from "../utils/cn";
 
-import { motion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 
 const SpotlightContext = createContext({
   highlightElement: (
@@ -62,6 +62,7 @@ export function SpotlightProvider({
   const [activeComponent, setActiveComponent] =
     useState<React.ReactElement | null>(null);
   const [isPersistent, setIsPersistent] = useState(false);
+  const [mousePosition, setMousePosition] = useState<[number, number]>([0, 0]);
 
   const highlightElement = useCallback(
     (
@@ -83,7 +84,7 @@ export function SpotlightProvider({
 
       // Ensure the highlighted element is above the blocking overlay
       element.style.position = element.style.position || "relative";
-      element.style.zIndex = "46";
+      element.style.zIndex = "51";
     },
     [isActive, isPersistent]
   );
@@ -92,6 +93,7 @@ export function SpotlightProvider({
     // Reset z-index on the previously active element
     if (activeElement) {
       activeElement.style.zIndex = "";
+      activeElement.style.transform = "";
       if (
         activeElement.style.position === "relative" &&
         !activeElement.style.cssText.includes("position")
@@ -99,7 +101,6 @@ export function SpotlightProvider({
         activeElement.style.position = "";
       }
     }
-
     setActiveElement(null);
     setElementRect(null);
     setActiveComponent(null);
@@ -116,6 +117,66 @@ export function SpotlightProvider({
     },
     [activeElement, clearSpotlight]
   );
+
+  // useEffect(() => {
+  //   const updateMousePosition = (e: MouseEvent) => {
+  //     setMousePosition([e.clientX, e.clientY]);
+  //   };
+
+  //   window.addEventListener("mousemove", (e) => updateMousePosition(e));
+
+  //   return () => {
+  //     window.removeEventListener("mousemove", updateMousePosition);
+  //   };
+  // }, []);
+
+  // useEffect(() => {
+  //   if (activeElement && elementRect && isPersistent) {
+  //     const spotlightCenterX = elementRect.left + elementRect.width / 2;
+  //     const spotlightCenterY = elementRect.top + elementRect.height / 2;
+
+  //     // Calculate spotlight radius
+  //     const spotlightRadius =
+  //       Math.max(elementRect.width, elementRect.height) / 2 + spotlightPadding;
+
+  //     // Calculate mouse distance from spotlight center
+  //     const mouseDistanceX = mousePosition[0] - spotlightCenterX;
+  //     const mouseDistanceY = mousePosition[1] - spotlightCenterY;
+  //     const mouseDistanceFromCenter = Math.sqrt(
+  //       mouseDistanceX * mouseDistanceX + mouseDistanceY * mouseDistanceY
+  //     );
+
+  //     // Only apply parallax if mouse is within spotlight
+  //     if (mouseDistanceFromCenter <= spotlightRadius) {
+  //       // Calculate how close to edge (0 = center, 1 = edge)
+  //       const edgeProximity = mouseDistanceFromCenter / spotlightRadius;
+
+  //       // Reduce effect near edges (creates smooth falloff)
+  //       const falloffFactor = Math.pow(1 - edgeProximity, 2);
+
+  //       // Apply parallax with falloff
+  //       const baseOffset = 0.15;
+  //       const effectiveOffset = baseOffset * falloffFactor;
+
+  //       const mouseOffsetX = mouseDistanceX * effectiveOffset;
+  //       const mouseOffsetY = mouseDistanceY * effectiveOffset;
+
+  //       activeElement.style.setProperty(
+  //         "transform",
+  //         `translateX(${mouseOffsetX}px) translateY(${mouseOffsetY}px)`,
+  //         "important"
+  //       );
+  //       activeElement.style.transition = "transform 0.08s ease-out";
+  //     } else {
+  //       // Reset when mouse leaves spotlight area
+  //       activeElement.style.setProperty(
+  //         "transform",
+  //         "translateX(0px) translateY(0px)",
+  //         "important"
+  //       );
+  //     }
+  //   }
+  // }, [mousePosition, elementRect, isPersistent, activeElement]);
 
   useEffect(() => {
     if (activeElement && isActive) {
@@ -150,40 +211,35 @@ export function SpotlightProvider({
         <>
           {/* Blocking overlay - prevents interaction with all elements except spotlit one */}
           {blockInteractions && (
-            <div
-              className="fixed inset-0 z-[45]"
-              style={{
-                pointerEvents: "auto",
-                clipPath: `polygon(
-                  0% 0%, 
-                  0% 100%, 
-                  ${elementRect.left - spotlightPadding}px 100%, 
-                  ${elementRect.left - spotlightPadding}px ${
-                  elementRect.top - spotlightPadding
-                }px, 
-                  ${elementRect.right + spotlightPadding}px ${
-                  elementRect.top - spotlightPadding
-                }px, 
-                  ${elementRect.right + spotlightPadding}px ${
-                  elementRect.bottom + spotlightPadding
-                }px, 
-                  ${elementRect.left - spotlightPadding}px ${
-                  elementRect.bottom + spotlightPadding
-                }px, 
-                  ${elementRect.left - spotlightPadding}px 100%, 
-                  100% 100%, 
-                  100% 0%
-                )`,
-              }}
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                // Optionally clear spotlight when clicking outside
-                if (!isPersistent) {
-                  clearSpotlight();
-                }
-              }}
-            />
+            <>
+              {/* Full blocking layer */}
+              <div
+                className="fixed inset-0 z-[49]"
+                style={{
+                  pointerEvents: "auto",
+                  backgroundColor: "transparent",
+                }}
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  // Optionally clear spotlight when clicking outside
+                  if (!isPersistent) {
+                    clearSpotlight();
+                  }
+                }}
+              />
+              {/* Spotlight hole - allows interaction with highlighted element */}
+              <div
+                className="fixed z-[50]"
+                style={{
+                  left: elementRect.left - spotlightPadding,
+                  top: elementRect.top - spotlightPadding,
+                  width: elementRect.width + spotlightPadding * 2,
+                  height: elementRect.height + spotlightPadding * 2,
+                  pointerEvents: "none",
+                }}
+              />
+            </>
           )}
 
           {/* Dark overlay - controls how visible content outside spotlight is */}
@@ -226,21 +282,24 @@ export function SpotlightProvider({
             }}
           />
 
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1, transition: { duration: 0.3 } }}
-            className={cn(
-              "absolute border-2 border-[#ccc] rounded-full pointer-events-none z-[55]",
-              borderClassName
-            )}
-            style={{
-              left: elementRect.left + elementRect.width / 2 + window.scrollX,
-              top: elementRect.top + elementRect.height / 2 + window.scrollY,
-              width: Math.max(elementRect.width, elementRect.height) + 80,
-              height: Math.max(elementRect.width, elementRect.height) + 80,
-              transform: "translate(-50%, -50%)",
-            }}
-          />
+          <AnimatePresence>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1, transition: { duration: 0.3 } }}
+              exit={{ opacity: 0, transition: { duration: 5 } }}
+              className={cn(
+                "absolute border-2 border-[#ccc] rounded-full pointer-events-none z-[55]",
+                borderClassName
+              )}
+              style={{
+                left: elementRect.left + elementRect.width / 2 + window.scrollX,
+                top: elementRect.top + elementRect.height / 2 + window.scrollY,
+                width: Math.max(elementRect.width, elementRect.height) + 80,
+                height: Math.max(elementRect.width, elementRect.height) + 80,
+                transform: "translate(-50%, -50%)",
+              }}
+            />
+          </AnimatePresence>
 
           {/* Custom component tooltip */}
           {activeComponent && (
