@@ -42,6 +42,11 @@ export function TestComponent() {
     addedComponent: <SimpleTooltip />,
   });
 
+  const spotlight2 = useSpotlightTarget({
+    highlightOnHover: true,
+    addedComponent: <SimpleTooltip />,
+  });
+
   const spotlightWithButton = useSpotlightTarget({
     highlightOnHover: true,
     dontDisappear: true,
@@ -60,6 +65,19 @@ export function TestComponent() {
             className="cursor-pointer bg-blue-600 px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors"
           >
             Standard Spotlight
+          </p>
+          <small className="text-gray-400 mt-2 block">
+            Hover for basic tooltip
+          </small>
+        </div>
+
+        <div className="text-center">
+          <p
+            ref={spotlight2.ref}
+            onClick={() => alert("Hi")}
+            className="cursor-pointer bg-blue-600 px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors"
+          >
+            Second spotlight
           </p>
           <small className="text-gray-400 mt-2 block">
             Hover for basic tooltip

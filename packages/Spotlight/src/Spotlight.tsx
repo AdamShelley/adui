@@ -118,66 +118,6 @@ export function SpotlightProvider({
     [activeElement, clearSpotlight]
   );
 
-  // useEffect(() => {
-  //   const updateMousePosition = (e: MouseEvent) => {
-  //     setMousePosition([e.clientX, e.clientY]);
-  //   };
-
-  //   window.addEventListener("mousemove", (e) => updateMousePosition(e));
-
-  //   return () => {
-  //     window.removeEventListener("mousemove", updateMousePosition);
-  //   };
-  // }, []);
-
-  // useEffect(() => {
-  //   if (activeElement && elementRect && isPersistent) {
-  //     const spotlightCenterX = elementRect.left + elementRect.width / 2;
-  //     const spotlightCenterY = elementRect.top + elementRect.height / 2;
-
-  //     // Calculate spotlight radius
-  //     const spotlightRadius =
-  //       Math.max(elementRect.width, elementRect.height) / 2 + spotlightPadding;
-
-  //     // Calculate mouse distance from spotlight center
-  //     const mouseDistanceX = mousePosition[0] - spotlightCenterX;
-  //     const mouseDistanceY = mousePosition[1] - spotlightCenterY;
-  //     const mouseDistanceFromCenter = Math.sqrt(
-  //       mouseDistanceX * mouseDistanceX + mouseDistanceY * mouseDistanceY
-  //     );
-
-  //     // Only apply parallax if mouse is within spotlight
-  //     if (mouseDistanceFromCenter <= spotlightRadius) {
-  //       // Calculate how close to edge (0 = center, 1 = edge)
-  //       const edgeProximity = mouseDistanceFromCenter / spotlightRadius;
-
-  //       // Reduce effect near edges (creates smooth falloff)
-  //       const falloffFactor = Math.pow(1 - edgeProximity, 2);
-
-  //       // Apply parallax with falloff
-  //       const baseOffset = 0.15;
-  //       const effectiveOffset = baseOffset * falloffFactor;
-
-  //       const mouseOffsetX = mouseDistanceX * effectiveOffset;
-  //       const mouseOffsetY = mouseDistanceY * effectiveOffset;
-
-  //       activeElement.style.setProperty(
-  //         "transform",
-  //         `translateX(${mouseOffsetX}px) translateY(${mouseOffsetY}px)`,
-  //         "important"
-  //       );
-  //       activeElement.style.transition = "transform 0.08s ease-out";
-  //     } else {
-  //       // Reset when mouse leaves spotlight area
-  //       activeElement.style.setProperty(
-  //         "transform",
-  //         "translateX(0px) translateY(0px)",
-  //         "important"
-  //       );
-  //     }
-  //   }
-  // }, [mousePosition, elementRect, isPersistent, activeElement]);
-
   useEffect(() => {
     if (activeElement && isActive) {
       // Update position on scroll/resize
