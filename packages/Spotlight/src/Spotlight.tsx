@@ -352,3 +352,98 @@ export function useSpotlightTarget(config: UseSpotlightTargetConfig = {}) {
     requestSpotlight: highlight,
   };
 }
+
+// Hook for multiple elements with different tooltips
+
+export interface SpotlightItem {
+  id: string;
+  component?: React.ReactElement;
+  persistent?: boolean;
+}
+
+export function useSpotlightGroup(config: {
+  highlightOnHover?: boolean;
+  items: Record<string, SpotlightItem>;
+}) {
+  const { highlightElement, clearSpotlightFromElement } =
+    useContext(SpotlightContext);
+  const elementsRef = useRef<Map<string, HTMLElement>>(new Map());
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  const highlight = useCallback(
+    (id: string) => {
+      const element = elementsRef.current.get(id);
+      const item = config.items[id];
+
+      if (element && item) {
+        // Clear any pending timeout
+        if (timeoutRef.current) {
+          clearTimeout(timeoutRef.current);
+          timeoutRef.current = null;
+        }
+        highlightElement(element, item.component, item.persistent);
+      }
+    },
+    [highlightElement, config.items]
+  );
+
+  const stopHighlight = useCallback(
+    (id: string) => {
+      const element = elementsRef.current.get(id);
+      const item = config.items[id];
+
+      if (element) {
+        // Clear any pending timeout first
+        if (timeoutRef.current) {
+          clearTimeout(timeoutRef.current);
+          timeoutRef.current = null;
+        }
+
+        // For persistent spotlights, clear immediately
+        // For non-persistent, add a small delay to prevent rapid on/off cycling
+        if (item?.persistent) {
+          clearSpotlightFromElement(element);
+        } else {
+          timeoutRef.current = setTimeout(() => {
+            clearSpotlightFromElement(element);
+          }, 100);
+        }
+      }
+    },
+    [clearSpotlightFromElement, config.items]
+  );
+
+  const getRef = useCallback(
+    (id: string) => (node: HTMLElement | null) => {
+      if (node) {
+        elementsRef.current.set(id, node);
+
+        if (config.highlightOnHover) {
+          const handleMouseEnter = () => highlight(id);
+          const handleMouseLeave = () => stopHighlight(id);
+
+          node.addEventListener("mouseenter", handleMouseEnter);
+
+          if (!config.items[id]?.persistent) {
+            node.addEventListener("mouseleave", handleMouseLeave);
+          }
+
+          // Store cleanup function
+          return () => {
+            node.removeEventListener("mouseenter", handleMouseEnter);
+            node.removeEventListener("mouseleave", handleMouseLeave);
+          };
+        }
+      } else {
+        elementsRef.current.delete(id);
+      }
+    },
+    [config.highlightOnHover, config.items, highlight, stopHighlight]
+  );
+
+  return {
+    getRef,
+    highlight,
+    stopHighlight,
+  };
+}

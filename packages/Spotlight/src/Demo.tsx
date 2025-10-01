@@ -1,4 +1,4 @@
-import { useSpotlightTarget } from "./Spotlight";
+import { useSpotlightTarget, useSpotlightGroup } from "./Spotlight";
 import { useContext } from "react";
 import { SpotlightContext } from "./Spotlight";
 
@@ -32,6 +32,245 @@ const InteractiveSpotlight = () => {
       >
         Click me to exit spotlight
       </button>
+    </div>
+  );
+};
+
+// Example with multiple items using ONE hook
+const MultiItemExample = () => {
+  const spotlightGroup = useSpotlightGroup({
+    highlightOnHover: true,
+    items: {
+      item1: {
+        id: "item1",
+        component: (
+          <div>
+            <h4 className="font-bold text-gray-900 dark:text-white mb-2">
+              Item 1
+            </h4>
+            <p className="text-gray-600 dark:text-gray-300">
+              This is the first item's tooltip!
+            </p>
+          </div>
+        ),
+      },
+      item2: {
+        id: "item2",
+        component: (
+          <div>
+            <h4 className="font-bold text-gray-900 dark:text-white mb-2">
+              Item 2
+            </h4>
+            <p className="text-gray-600 dark:text-gray-300">
+              This is the second item's tooltip!
+            </p>
+          </div>
+        ),
+      },
+      item3: {
+        id: "item3",
+        component: <InteractiveSpotlight />,
+        persistent: true,
+      },
+      item4: {
+        id: "item4",
+        component: (
+          <div>
+            <h4 className="font-bold text-gray-900 dark:text-white mb-2">
+              Item 4
+            </h4>
+            <p className="text-gray-600 dark:text-gray-300">
+              Fourth item with its own content!
+            </p>
+          </div>
+        ),
+      },
+      item5: {
+        id: "item5",
+        component: (
+          <div>
+            <h4 className="font-bold text-gray-900 dark:text-white mb-2">
+              Item 5
+            </h4>
+            <p className="text-gray-600 dark:text-gray-300">
+              And the fifth one completes the set!
+            </p>
+          </div>
+        ),
+      },
+    },
+  });
+
+  return (
+    <div className="mt-8">
+      <h2 className="text-xl font-semibold mb-4">Multi-Item Group Example</h2>
+      <p className="text-gray-400 text-sm mb-4">
+        One hook managing 5 different spotlights!
+      </p>
+      <div className="grid grid-cols-5 gap-4">
+        {["item1", "item2", "item3", "item4", "item5"].map((id, index) => (
+          <div
+            key={id}
+            ref={spotlightGroup.getRef(id)}
+            className="cursor-pointer bg-purple-600 px-4 py-3 rounded-lg hover:bg-purple-700 transition-colors text-center"
+          >
+            Item {index + 1}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+// Realistic layout example with normal components
+const RealisticLayoutExample = () => {
+  const spotlightGroup = useSpotlightGroup({
+    highlightOnHover: true,
+    items: {
+      logo: {
+        id: "logo",
+        component: (
+          <div>
+            <h4 className="font-bold text-gray-900 dark:text-white mb-2">
+              Logo
+            </h4>
+            <p className="text-gray-600 dark:text-gray-300">
+              Click here to return home
+            </p>
+          </div>
+        ),
+      },
+      searchBar: {
+        id: "searchBar",
+        component: (
+          <div>
+            <h4 className="font-bold text-gray-900 dark:text-white mb-2">
+              Search
+            </h4>
+            <p className="text-gray-600 dark:text-gray-300">
+              Search for products, categories, or content
+            </p>
+          </div>
+        ),
+      },
+      cart: {
+        id: "cart",
+        component: (
+          <div>
+            <h4 className="font-bold text-gray-900 dark:text-white mb-2">
+              Shopping Cart
+            </h4>
+            <p className="text-gray-600 dark:text-gray-300">
+              View your cart items and checkout
+            </p>
+          </div>
+        ),
+      },
+      profile: {
+        id: "profile",
+        component: (
+          <div>
+            <h4 className="font-bold text-gray-900 dark:text-white mb-2">
+              Profile
+            </h4>
+            <p className="text-gray-600 dark:text-gray-300">
+              Manage your account settings
+            </p>
+          </div>
+        ),
+      },
+      sidebarItem: {
+        id: "sidebarItem",
+        component: (
+          <div>
+            <h4 className="font-bold text-gray-900 dark:text-white mb-2">
+              Navigation Menu
+            </h4>
+            <p className="text-gray-600 dark:text-gray-300">
+              Browse through different sections
+            </p>
+          </div>
+        ),
+      },
+    },
+  });
+
+  return (
+    <div className="mt-8 w-full max-w-4xl mx-auto">
+      <h2 className="text-xl font-semibold mb-4">Realistic Layout Example</h2>
+      <p className="text-gray-400 text-sm mb-4">
+        See how it works with typical UI components
+      </p>
+
+      {/* Header */}
+      <header className="bg-gray-800 p-4 rounded-lg mb-4">
+        <div className="flex items-center justify-between">
+          {/* Logo */}
+          <div
+            ref={spotlightGroup.getRef("logo")}
+            className="text-xl font-bold cursor-pointer hover:text-blue-400 transition-colors"
+          >
+            MyApp
+          </div>
+
+          {/* Search Bar */}
+          <div ref={spotlightGroup.getRef("searchBar")} className="flex-1 mx-8">
+            <input
+              type="text"
+              placeholder="Search..."
+              className="w-full bg-gray-700 px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+
+          {/* Actions */}
+          <div className="flex gap-4">
+            <button
+              ref={spotlightGroup.getRef("cart")}
+              className="bg-gray-700 px-4 py-2 rounded-lg hover:bg-gray-600 transition-colors"
+            >
+              Cart (3)
+            </button>
+            <button
+              ref={spotlightGroup.getRef("profile")}
+              className="bg-blue-600 px-4 py-2 rounded-lg hover:bg-blue-500 transition-colors"
+            >
+              Profile
+            </button>
+          </div>
+        </div>
+      </header>
+
+      {/* Content Area with Sidebar */}
+      <div className="flex gap-4">
+        {/* Sidebar */}
+        <aside className="bg-gray-800 p-4 rounded-lg w-48">
+          <nav>
+            <ul className="space-y-2">
+              <li
+                ref={spotlightGroup.getRef("sidebarItem")}
+                className="cursor-pointer hover:bg-gray-700 p-2 rounded transition-colors"
+              >
+                Dashboard
+              </li>
+              <li className="cursor-pointer hover:bg-gray-700 p-2 rounded transition-colors">
+                Products
+              </li>
+              <li className="cursor-pointer hover:bg-gray-700 p-2 rounded transition-colors">
+                Orders
+              </li>
+            </ul>
+          </nav>
+        </aside>
+
+        {/* Main Content */}
+        <main className="flex-1 bg-gray-800 p-6 rounded-lg">
+          <h3 className="text-lg font-semibold mb-4">Main Content Area</h3>
+          <p className="text-gray-400">
+            Hover over the header elements or sidebar to see spotlights in
+            action!
+          </p>
+        </main>
+      </div>
     </div>
   );
 };
@@ -96,6 +335,10 @@ export function TestComponent() {
           </small>
         </div>
       </div>
+
+      <MultiItemExample />
+
+      <RealisticLayoutExample />
 
       <div className="mt-8 text-center">
         <p className="text-gray-300 mb-4">
