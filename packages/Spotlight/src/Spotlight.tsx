@@ -353,7 +353,7 @@ export function useSpotlightTarget(config: UseSpotlightTargetConfig = {}) {
   };
 }
 
-// Hook for multiple elements with different tooltips
+// Main Spotlight Hook - handles both single and multiple elements
 
 export interface SpotlightItem {
   id: string;
@@ -361,19 +361,56 @@ export interface SpotlightItem {
   persistent?: boolean;
 }
 
-export function useSpotlightGroup(config: {
+type SingleElementConfig = {
+  highlightOnHover?: boolean;
+  component?: React.ReactElement;
+  persistent?: boolean;
+  items?: never;
+};
+
+type MultipleElementsConfig = {
   highlightOnHover?: boolean;
   items: Record<string, SpotlightItem>;
-}) {
+  component?: never;
+  persistent?: never;
+};
+
+type UseSpotlightConfig = SingleElementConfig | MultipleElementsConfig;
+
+// Overload signatures for better type inference
+export function useSpotlight(config: SingleElementConfig): {
+  ref: (node: HTMLElement | null) => void;
+  highlight: () => void;
+  stopHighlight: () => void;
+};
+export function useSpotlight(config: MultipleElementsConfig): {
+  getRef: (id: string) => (node: HTMLElement | null) => void;
+  highlight: (id: string) => void;
+  stopHighlight: (id: string) => void;
+};
+export function useSpotlight(config: UseSpotlightConfig = {}): any {
   const { highlightElement, clearSpotlightFromElement } =
     useContext(SpotlightContext);
   const elementsRef = useRef<Map<string, HTMLElement>>(new Map());
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const singleElementRef = useRef<HTMLElement | null>(null);
+
+  // Check if we're in single or multiple element mode
+  const isSingleMode = !config.items;
+  const SINGLE_ID = "__single__";
 
   const highlight = useCallback(
-    (id: string) => {
-      const element = elementsRef.current.get(id);
-      const item = config.items[id];
+    (id?: string) => {
+      const elementId = isSingleMode ? SINGLE_ID : id;
+      if (!elementId) return;
+
+      const element = elementsRef.current.get(elementId);
+      const item = isSingleMode
+        ? {
+            component: config.component,
+            persistent: config.persistent,
+          }
+        : config.items?.[elementId];
 
       if (element && item) {
         // Clear any pending timeout
@@ -384,13 +421,24 @@ export function useSpotlightGroup(config: {
         highlightElement(element, item.component, item.persistent);
       }
     },
-    [highlightElement, config.items]
+    [
+      highlightElement,
+      config.items,
+      config.component,
+      config.persistent,
+      isSingleMode,
+    ]
   );
 
   const stopHighlight = useCallback(
-    (id: string) => {
-      const element = elementsRef.current.get(id);
-      const item = config.items[id];
+    (id?: string) => {
+      const elementId = isSingleMode ? SINGLE_ID : id;
+      if (!elementId) return;
+
+      const element = elementsRef.current.get(elementId);
+      const item = isSingleMode
+        ? { persistent: config.persistent }
+        : config.items?.[elementId];
 
       if (element) {
         // Clear any pending timeout first
@@ -410,9 +458,40 @@ export function useSpotlightGroup(config: {
         }
       }
     },
-    [clearSpotlightFromElement, config.items]
+    [clearSpotlightFromElement, config.items, config.persistent, isSingleMode]
   );
 
+  // For single element mode
+  const singleRef = useCallback(
+    (node: HTMLElement | null) => {
+      if (node) {
+        elementsRef.current.set(SINGLE_ID, node);
+        singleElementRef.current = node;
+
+        if (config.highlightOnHover) {
+          const handleMouseEnter = () => highlight();
+          const handleMouseLeave = () => stopHighlight();
+
+          node.addEventListener("mouseenter", handleMouseEnter);
+
+          if (!config.persistent) {
+            node.addEventListener("mouseleave", handleMouseLeave);
+          }
+
+          return () => {
+            node.removeEventListener("mouseenter", handleMouseEnter);
+            node.removeEventListener("mouseleave", handleMouseLeave);
+          };
+        }
+      } else {
+        elementsRef.current.delete(SINGLE_ID);
+        singleElementRef.current = null;
+      }
+    },
+    [config.highlightOnHover, config.persistent, highlight, stopHighlight]
+  );
+
+  // For multiple elements mode
   const getRef = useCallback(
     (id: string) => (node: HTMLElement | null) => {
       if (node) {
@@ -424,11 +503,10 @@ export function useSpotlightGroup(config: {
 
           node.addEventListener("mouseenter", handleMouseEnter);
 
-          if (!config.items[id]?.persistent) {
+          if (!config.items?.[id]?.persistent) {
             node.addEventListener("mouseleave", handleMouseLeave);
           }
 
-          // Store cleanup function
           return () => {
             node.removeEventListener("mouseenter", handleMouseEnter);
             node.removeEventListener("mouseleave", handleMouseLeave);
@@ -440,6 +518,15 @@ export function useSpotlightGroup(config: {
     },
     [config.highlightOnHover, config.items, highlight, stopHighlight]
   );
+
+  // Return different API based on mode
+  if (isSingleMode) {
+    return {
+      ref: singleRef,
+      highlight: () => highlight(),
+      stopHighlight: () => stopHighlight(),
+    };
+  }
 
   return {
     getRef,

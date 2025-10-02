@@ -1,130 +1,8 @@
-import { useSpotlightTarget, useSpotlightGroup } from "./Spotlight";
-import { useContext } from "react";
-import { SpotlightContext } from "./Spotlight";
-
-const SimpleTooltip = () => {
-  return (
-    <div>
-      <h3 className="font-bold text-gray-900 dark:text-white mb-2">
-        Welcome to Spotlight!
-      </h3>
-      <p className="text-gray-600 dark:text-gray-300">
-        This is a custom tooltip that appears when you hover over this element.
-      </p>
-    </div>
-  );
-};
-
-const InteractiveSpotlight = () => {
-  const { clearSpotlight } = useContext(SpotlightContext);
-
-  return (
-    <div>
-      <h4 className="font-semibold text-gray-900 dark:text-white mb-2">
-        Interactive Tooltip
-      </h4>
-      <p className="text-gray-600 dark:text-gray-300 mb-3">
-        You can even add interactive elements!
-      </p>
-      <button
-        className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-sm"
-        onClick={() => clearSpotlight()}
-      >
-        Click me to exit spotlight
-      </button>
-    </div>
-  );
-};
-
-// Example with multiple items using ONE hook
-const MultiItemExample = () => {
-  const spotlightGroup = useSpotlightGroup({
-    highlightOnHover: true,
-    items: {
-      item1: {
-        id: "item1",
-        component: (
-          <div>
-            <h4 className="font-bold text-gray-900 dark:text-white mb-2">
-              Item 1
-            </h4>
-            <p className="text-gray-600 dark:text-gray-300">
-              This is the first item's tooltip!
-            </p>
-          </div>
-        ),
-      },
-      item2: {
-        id: "item2",
-        component: (
-          <div>
-            <h4 className="font-bold text-gray-900 dark:text-white mb-2">
-              Item 2
-            </h4>
-            <p className="text-gray-600 dark:text-gray-300">
-              This is the second item's tooltip!
-            </p>
-          </div>
-        ),
-      },
-      item3: {
-        id: "item3",
-        component: <InteractiveSpotlight />,
-        persistent: true,
-      },
-      item4: {
-        id: "item4",
-        component: (
-          <div>
-            <h4 className="font-bold text-gray-900 dark:text-white mb-2">
-              Item 4
-            </h4>
-            <p className="text-gray-600 dark:text-gray-300">
-              Fourth item with its own content!
-            </p>
-          </div>
-        ),
-      },
-      item5: {
-        id: "item5",
-        component: (
-          <div>
-            <h4 className="font-bold text-gray-900 dark:text-white mb-2">
-              Item 5
-            </h4>
-            <p className="text-gray-600 dark:text-gray-300">
-              And the fifth one completes the set!
-            </p>
-          </div>
-        ),
-      },
-    },
-  });
-
-  return (
-    <div className="mt-8">
-      <h2 className="text-xl font-semibold mb-4">Multi-Item Group Example</h2>
-      <p className="text-gray-400 text-sm mb-4">
-        One hook managing 5 different spotlights!
-      </p>
-      <div className="grid grid-cols-5 gap-4">
-        {["item1", "item2", "item3", "item4", "item5"].map((id, index) => (
-          <div
-            key={id}
-            ref={spotlightGroup.getRef(id)}
-            className="cursor-pointer bg-purple-600 px-4 py-3 rounded-lg hover:bg-purple-700 transition-colors text-center"
-          >
-            Item {index + 1}
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-};
+import { useSpotlight } from "./Spotlight";
 
 // Realistic layout example with normal components
 const RealisticLayoutExample = () => {
-  const spotlightGroup = useSpotlightGroup({
+  const spotlightGroup = useSpotlight({
     highlightOnHover: true,
     items: {
       logo: {
@@ -275,68 +153,44 @@ const RealisticLayoutExample = () => {
   );
 };
 
-export function TestComponent() {
-  const spotlight = useSpotlightTarget({
+// Simple single element example
+const SingleElementExample = () => {
+  const spotlight = useSpotlight({
     highlightOnHover: true,
-    addedComponent: <SimpleTooltip />,
-  });
-
-  const spotlight2 = useSpotlightTarget({
-    highlightOnHover: true,
-    addedComponent: <SimpleTooltip />,
-  });
-
-  const spotlightWithButton = useSpotlightTarget({
-    highlightOnHover: true,
-    dontDisappear: true,
-    addedComponent: <InteractiveSpotlight />,
+    component: (
+      <div>
+        <h4 className="font-bold text-gray-900 dark:text-white mb-2">
+          Single Element Spotlight
+        </h4>
+        <p className="text-gray-600 dark:text-gray-300">
+          This is the easiest way to add a spotlight to a single element!
+        </p>
+      </div>
+    ),
   });
 
   return (
-    <div className="dark:bg-gray-950 w-screen h-screen text-white flex items-center justify-center flex-col gap-10">
+    <div className="text-center">
+      <h2 className="text-xl font-semibold mb-4">Single Element Mode</h2>
+      <button
+        ref={spotlight.ref}
+        className="bg-blue-600 px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors"
+      >
+        Hover me!
+      </button>
+      <p className="text-gray-400 text-sm mt-2">
+        Simple single element with just <code>ref</code>
+      </p>
+    </div>
+  );
+};
+
+export function TestComponent() {
+  return (
+    <div className="dark:bg-gray-950 w-screen h-screen text-white flex items-center justify-start flex-col gap-10 p-10 overflow-y-auto">
       <h1 className="text-3xl font-bold mb-8">Spotlight Demo</h1>
 
-      <div className="grid grid-cols-2 gap-8">
-        <div className="text-center">
-          <p
-            ref={spotlight.ref}
-            onClick={() => alert("Hi")}
-            className="cursor-pointer bg-blue-600 px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors"
-          >
-            Standard Spotlight
-          </p>
-          <small className="text-gray-400 mt-2 block">
-            Hover for basic tooltip
-          </small>
-        </div>
-
-        <div className="text-center">
-          <p
-            ref={spotlight2.ref}
-            onClick={() => alert("Hi")}
-            className="cursor-pointer bg-blue-600 px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors"
-          >
-            Second spotlight
-          </p>
-          <small className="text-gray-400 mt-2 block">
-            Hover for basic tooltip
-          </small>
-        </div>
-
-        <div className="text-center">
-          <p
-            ref={spotlightWithButton.ref}
-            className="cursor-pointer bg-green-600 px-6 py-3 rounded-lg hover:bg-green-700 transition-colors"
-          >
-            Interactive Spotlight
-          </p>
-          <small className="text-gray-400 mt-2 block">
-            Hover for interactive tooltip
-          </small>
-        </div>
-      </div>
-
-      <MultiItemExample />
+      <SingleElementExample />
 
       <RealisticLayoutExample />
 

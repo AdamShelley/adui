@@ -1,5 +1,9 @@
-export { SpotlightProvider, useSpotlightTarget } from "./Spotlight";
-export type { SpotlightProviderProps } from "./Spotlight";
+export {
+  SpotlightProvider,
+  useSpotlightTarget,
+  useSpotlight,
+} from "./Spotlight";
+export type { SpotlightProviderProps, SpotlightItem } from "./Spotlight";
 export type {
   SpotlightTargetConfig,
   SpotlightContextValue,
