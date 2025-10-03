@@ -18,6 +18,7 @@ export interface SpotlightContextValue {
   clearSpotlight: () => void;
   clearSpotlightFromElement: (element: HTMLElement) => void;
   isActive: boolean;
+  disabled: boolean;
 }
 
 export interface SpotlightTargetReturn {

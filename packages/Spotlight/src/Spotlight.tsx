@@ -21,6 +21,7 @@ const SpotlightContext = createContext({
   clearSpotlight: () => {},
   clearSpotlightFromElement: (_element: HTMLElement) => {},
   isActive: false,
+  disabled: false,
 });
 
 export { SpotlightContext };
@@ -39,6 +40,7 @@ export interface SpotlightProviderProps {
   tooltipClassName?: string; // styles for the tooltip container
   spotlightShape?: SpotlightShape;
   blockInteractions?: boolean; // whether to block interactions with elements outside spotlight, default true
+  disabled?: boolean; // if true, all spotlights are disabled and won't show, default false
 }
 
 type SpotlightShape = "circle" | "square";
@@ -55,6 +57,7 @@ export function SpotlightProvider({
   tooltipClassName,
   spotlightShape = "circle",
   blockInteractions = true,
+  disabled = false,
 }: SpotlightProviderProps) {
   const [activeElement, setActiveElement] = useState<HTMLElement | null>(null);
   const [isActive, setIsActive] = useState(false);
@@ -70,6 +73,11 @@ export function SpotlightProvider({
       component?: React.ReactElement,
       persistent?: boolean
     ) => {
+      // Don't show spotlight if disabled
+      if (disabled) {
+        return;
+      }
+
       // Don't allow new spotlights to override a persistent one
       if (isActive && isPersistent && !persistent) {
         return;
@@ -86,7 +94,7 @@ export function SpotlightProvider({
       element.style.position = element.style.position || "relative";
       element.style.zIndex = "51";
     },
-    [isActive, isPersistent]
+    [isActive, isPersistent, disabled]
   );
 
   const clearSpotlight = useCallback(() => {
@@ -143,11 +151,12 @@ export function SpotlightProvider({
         clearSpotlight,
         clearSpotlightFromElement,
         isActive,
+        disabled,
       }}
     >
       {children}
       {/* Spotlight overlay */}
-      {isActive && elementRect && (
+      {!disabled && isActive && elementRect && (
         <>
           {/* Blocking overlay - prevents interaction with all elements except spotlit one */}
           {blockInteractions && (

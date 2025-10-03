@@ -10,6 +10,7 @@ export default function App() {
         spotlightPadding={50}
         spotlightShape="circle"
         blockInteractions={true}
+        disabled={true}
       >
         <TestComponent />
       </SpotlightProvider>
